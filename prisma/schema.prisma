@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id
+  password      String
+  nickname      String
+  favorite_team String?
+  created_at    DateTime @default(now())
+  posts         Post[]
+  comments      Comment[]
+  postLikes     PostLike[]
+  commentLikes  CommentLike[]
+}
+
+model Post {
+  id         Int           @id @default(autoincrement())
+  user_id    String
+  title      String
+  content    String
+  likes_count Int          @default(0)
+  created_at DateTime      @default(now())
+  updated_at DateTime      @updatedAt
+  user       User          @relation(fields: [user_id], references: [id])
+  comments   Comment[]
+  likes      PostLike[]
+}
+
+model Comment {
+  id         Int           @id @default(autoincrement())
+  post_id    Int
+  user_id    String
+  content    String
+  likes_count Int          @default(0)
+  created_at DateTime      @default(now())
+  post       Post          @relation(fields: [post_id], references: [id])
+  user       User          @relation(fields: [user_id], references: [id])
+  likes      CommentLike[]
+}
+
+model PostLike {
+  id         Int       @id @default(autoincrement())
+  post_id    Int
+  user_id    String
+  created_at DateTime  @default(now())
+  post       Post      @relation(fields: [post_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id])
+}
+
+model CommentLike {
+  id         Int       @id @default(autoincrement())
+  comment_id Int
+  user_id    String
+  created_at DateTime  @default(now())
+  comment    Comment   @relation(fields: [comment_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id])
+}
+
+model Team {
+  id       Int       @id @default(autoincrement())
+  name     String
+  location String
+  stadium  String
+  logo_url String
+  players  Player[]
+  home_games Game[]   @relation("HomeGames")
+  away_games Game[]   @relation("AwayGames")
+  news     News[]
+}
+
+model Player {
+  id        Int      @id @default(autoincrement())
+  team_id   Int
+  name      String
+  position  String
+  stats_json Json
+  team      Team     @relation(fields: [team_id], references: [id])
+}
+
+model Game {
+  id            Int       @id @default(autoincrement())
+  home_team_id  Int
+  away_team_id  Int
+  game_date     DateTime
+  stadium       String
+  result_json   Json
+  home_team     Team      @relation("HomeGames", fields: [home_team_id], references: [id])
+  away_team     Team      @relation("AwayGames", fields: [away_team_id], references: [id])
+}
+
+model News {
+  id              Int       @id @default(autoincrement())
+  title           String
+  content_url     String
+  thumbnail_url   String
+  source          String
+  published_at    DateTime
+  related_team_id Int
+  team            Team      @relation(fields: [related_team_id], references: [id])
+}
