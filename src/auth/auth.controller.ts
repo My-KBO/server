@@ -18,6 +18,6 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: '로그인' })
   login(@Body() dto: LoginDto) {
-    return this.authService.login(dto.email, dto.password);
+    return this.authService.login(dto);
   }
 }
