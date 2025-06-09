@@ -8,12 +8,12 @@ datasource db {
 }
 
 model User {
-  id             String          @id @default(uuid())
-  email          String          @unique
+  id             String   @id @default(uuid())
+  email          String   @unique
   password       String
   nickname       String
-  favorite_team  String?
-  created_at     DateTime        @default(now())
+  favoriteTeam   String?  @map("favorite_team")
+  createdAt      DateTime @default(now()) @map("created_at")
 
   posts          Post[]
   comments       Comment[]
@@ -22,95 +22,95 @@ model User {
 }
 
 model Post {
-  id            Int           @id @default(autoincrement())
-  user_id       String
-  title         String
-  content       String
-  likes_count   Int           @default(0)
-  created_at    DateTime      @default(now())
-  updated_at    DateTime      @updatedAt
+  id           Int       @id @default(autoincrement())
+  userId       String    @map("user_id")
+  title        String
+  content      String
+  likesCount   Int       @default(0) @map("likes_count")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt      @map("updated_at")
 
-  user          User          @relation(fields: [user_id], references: [id])
-  comments      Comment[]
-  likes         PostLike[]
+  user         User      @relation(fields: [userId], references: [id])
+  comments     Comment[]
+  likes        PostLike[]
 }
 
 model Comment {
-  id            Int           @id @default(autoincrement())
-  post_id       Int
-  user_id       String
-  content       String
-  likes_count   Int           @default(0)
-  created_at    DateTime      @default(now())
+  id           Int       @id @default(autoincrement())
+  postId       Int       @map("post_id")
+  userId       String    @map("user_id")
+  content      String
+  likesCount   Int       @default(0) @map("likes_count")
+  createdAt    DateTime  @default(now()) @map("created_at")
 
-  post          Post          @relation(fields: [post_id], references: [id])
-  user          User          @relation(fields: [user_id], references: [id])
-  likes         CommentLike[]
+  post         Post      @relation(fields: [postId], references: [id])
+  user         User      @relation(fields: [userId], references: [id])
+  likes        CommentLike[]
 }
 
 model PostLike {
-  id            Int           @id @default(autoincrement())
-  post_id       Int
-  user_id       String
-  created_at    DateTime      @default(now())
+  id           Int       @id @default(autoincrement())
+  postId       Int       @map("post_id")
+  userId       String    @map("user_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
 
-  post          Post          @relation(fields: [post_id], references: [id])
-  user          User          @relation(fields: [user_id], references: [id])
+  post         Post      @relation(fields: [postId], references: [id])
+  user         User      @relation(fields: [userId], references: [id])
 }
 
 model CommentLike {
-  id            Int           @id @default(autoincrement())
-  comment_id    Int
-  user_id       String
-  created_at    DateTime      @default(now())
+  id           Int       @id @default(autoincrement())
+  commentId    Int       @map("comment_id")
+  userId       String    @map("user_id")
+  createdAt    DateTime  @default(now()) @map("created_at")
 
-  comment       Comment       @relation(fields: [comment_id], references: [id])
-  user          User          @relation(fields: [user_id], references: [id])
+  comment      Comment   @relation(fields: [commentId], references: [id])
+  user         User      @relation(fields: [userId], references: [id])
 }
 
 model Team {
-  id            Int           @id @default(autoincrement())
-  name          String
-  location      String
-  stadium       String
-  logo_url      String
+  id           Int       @id @default(autoincrement())
+  name         String
+  location     String
+  stadium      String
+  logoUrl      String    @map("logo_url")
 
-  players       Player[]
-  home_games    Game[]        @relation("HomeGames")
-  away_games    Game[]        @relation("AwayGames")
-  news          News[]
+  players      Player[]
+  homeGames    Game[]    @relation("HomeGames")
+  awayGames    Game[]    @relation("AwayGames")
+  news         News[]
 }
 
 model Player {
-  id            Int           @id @default(autoincrement())
-  team_id       Int
-  name          String
-  position      String
-  stats_json    Json
+  id          Int      @id @default(autoincrement())
+  teamId      Int      @map("team_id")
+  name        String
+  position    String
+  statsJson   Json     @map("stats_json")
 
-  team          Team          @relation(fields: [team_id], references: [id])
+  team        Team     @relation(fields: [teamId], references: [id])
 }
 
 model Game {
-  id            Int           @id @default(autoincrement())
-  home_team_id  Int
-  away_team_id  Int
-  game_date     DateTime
-  stadium       String
-  result_json   Json
+  id           Int      @id @default(autoincrement())
+  homeTeamId   Int      @map("home_team_id")
+  awayTeamId   Int      @map("away_team_id")
+  gameDate     DateTime @map("game_date")
+  stadium      String
+  resultJson   Json     @map("result_json")
 
-  home_team     Team          @relation("HomeGames", fields: [home_team_id], references: [id])
-  away_team     Team          @relation("AwayGames", fields: [away_team_id], references: [id])
+  homeTeam     Team     @relation("HomeGames", fields: [homeTeamId], references: [id])
+  awayTeam     Team     @relation("AwayGames", fields: [awayTeamId], references: [id])
 }
 
 model News {
-  id              Int        @id @default(autoincrement())
-  title           String
-  content_url     String
-  thumbnail_url   String
-  source          String
-  published_at    DateTime
-  related_team_id Int
+  id             Int      @id @default(autoincrement())
+  title          String
+  contentUrl     String   @map("content_url")
+  thumbnailUrl   String   @map("thumbnail_url")
+  source         String
+  publishedAt    DateTime @map("published_at")
+  relatedTeamId  Int      @map("related_team_id")
 
-  team            Team       @relation(fields: [related_team_id], references: [id])
+  team           Team     @relation(fields: [relatedTeamId], references: [id])
 }

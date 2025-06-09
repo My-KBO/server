@@ -17,5 +17,5 @@ export class SignupDto {
 
   @ApiProperty({ example: '한화 이글스', required: false })
   @IsString()
-  favorite_team?: string;
+  favoriteTeam?: string;
 }
