@@ -1,8 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  await app.listen(process.env.PORT ?? 3000);
+
+  const config = new DocumentBuilder()
+    .setTitle('MyKBO API')
+    .setDescription('KBO 응원팀 대시보드 및 커뮤니티 API 문서')
+    .setVersion('1.0')
+    .addBearerAuth() // TODO : Authorization: Bearer 토큰 입력 가능?
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
+
+  await app.listen(3000);
 }
 bootstrap();
