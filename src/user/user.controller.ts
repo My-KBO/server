@@ -1,5 +1,5 @@
 import { Controller, Get, Patch, Delete, UseGuards, Body } from '@nestjs/common';
-import { UsersService } from './user.service';
+import { UserService } from './user.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { User as UserEntity } from '@prisma/client';
 import { User } from './user.decorator';
@@ -7,8 +7,8 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/profile')
-export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+export class UserController {
+  constructor(private readonly usersService: UserService) {}
 
   @Get()
   getProfile(@User() user: UserEntity) {

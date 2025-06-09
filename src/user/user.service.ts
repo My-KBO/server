@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @Injectable()
-export class UsersService {
+export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getProfile(userId: string) {
