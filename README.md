@@ -27,11 +27,11 @@ server/
 │ │ ├── prisma.module.ts
 │ │ └── prisma.service.ts
 │ ├── config/ # 환경 설정 모듈 
-│ ├── app.module.ts # 루트 모듈
-│ ├── app.controller.ts # 루트 컨트롤러
+│ ├── app.module.ts 
+│ ├── app.controller.ts 
 │ └── main.ts 
 ├── test/
-├── .env # 환경변수 설정
+├── .env 
 ├── .eslintrc.js
 ├── .prettierrc
 ├── package.json
