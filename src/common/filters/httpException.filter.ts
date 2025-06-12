@@ -10,17 +10,19 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const status =
       exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const errorResponse =
+    const responseBody =
       exception instanceof HttpException
         ? exception.getResponse()
-        : { message: 'Internal server error' };
+        : { message: 'Internal server error', code: 5000 };
 
-    const message =
-      typeof errorResponse === 'string' ? errorResponse : (errorResponse as any).message;
+    const message = typeof responseBody === 'string' ? responseBody : (responseBody as any).message;
+
+    const code = typeof responseBody === 'string' ? status : ((responseBody as any).code ?? status);
 
     response.status(status).json({
       success: false,
       statusCode: status,
+      code,
       message: message || '알 수 없는 오류가 발생했습니다.',
       timestamp: new Date().toISOString(),
     });
