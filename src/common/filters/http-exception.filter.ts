@@ -1,29 +1,43 @@
 import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
+import { BusinessException } from '../exceptions/business.exception';
+import { ErrorCode } from '../constants/error-code';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+    const res = ctx.getResponse<Response>();
 
-    const status =
-      exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    let status = HttpStatus.INTERNAL_SERVER_ERROR;
+    let code: string = ErrorCode.INTERNAL_SERVER_ERROR;
+    let message = '서버 내부 오류';
 
-    const responseBody =
-      exception instanceof HttpException
-        ? exception.getResponse()
-        : { message: 'Internal server error', code: 5000 };
+    if (exception instanceof BusinessException) {
+      code = exception.code;
+      message = exception.message;
 
-    const message = typeof responseBody === 'string' ? responseBody : (responseBody as any).message;
+      switch (code) {
+        case ErrorCode.USER_NOT_FOUND:
+          status = HttpStatus.NOT_FOUND;
+          break;
+        case ErrorCode.EMAIL_ALREADY_EXISTS:
+          status = HttpStatus.CONFLICT;
+          break;
+        default:
+          status = HttpStatus.BAD_REQUEST;
+      }
+    } else if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const response = exception.getResponse();
+      message = typeof response === 'string' ? response : (response as any).message;
+    }
 
-    const code = typeof responseBody === 'string' ? status : ((responseBody as any).code ?? status);
-
-    response.status(status).json({
+    res.status(status).json({
       success: false,
       statusCode: status,
       code,
-      message: message || '알 수 없는 오류가 발생했습니다.',
+      message,
       timestamp: new Date().toISOString(),
     });
   }
