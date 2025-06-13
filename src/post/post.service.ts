@@ -100,7 +100,10 @@ export class PostService {
     });
 
     if (existing) {
-      throw new BusinessException(ErrorCode.Post.ALREADY_LIKED, ErrorMessage.Post.ALREADY_LIKED);
+      throw new BusinessException(
+        ErrorCode.Post.POST_ALREADY_LIKED,
+        ErrorMessage.Post.POST_ALREADY_LIKED,
+      );
     }
 
     await this.prisma.postLike.create({

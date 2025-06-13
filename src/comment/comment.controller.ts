@@ -49,17 +49,16 @@ export class CommentController {
   @ApiOperation({ summary: '댓글 좋아요 추가' })
   async likeComment(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @UserDecorator('id') userId: string,
+    @User('id') userId: string,
   ) {
     return this.commentService.like(commentId, userId);
   }
 
   @Delete(':commentId/like')
   @ApiOperation({ summary: '댓글 좋아요 취소' })
-  @HttpCode(204)
   async unlikeComment(
     @Param('commentId', ParseIntPipe) commentId: number,
-    @UserDecorator('id') userId: string,
+    @User('id') userId: string,
   ) {
     return this.commentService.unlike(commentId, userId);
   }

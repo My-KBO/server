@@ -66,8 +66,8 @@ export class CommentService {
     });
     if (exists) {
       throw new BusinessException(
-        ErrorCode.Comment.ALREADY_LIKED,
-        ErrorMessage.Comment.ALREADY_LIKED,
+        ErrorCode.Comment.COMMENT_ALREADY_LIKED,
+        ErrorMessage.Comment.COMMENT_ALREADY_LIKED,
       );
     }
 
@@ -83,8 +83,8 @@ export class CommentService {
 
     if (!like) {
       throw new BusinessException(
-        ErrorCode.Comment.LIKE_NOT_FOUND,
-        ErrorMessage.Comment.LIKE_NOT_FOUND,
+        ErrorCode.Comment.COMMENT_LIKE_NOT_FOUND,
+        ErrorMessage.Comment.COMMENT_LIKE_NOT_FOUND,
       );
     }
 
