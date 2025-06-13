@@ -24,7 +24,7 @@ export class PostService {
       data: {
         title: dto.title,
         content: dto.content,
-        userId,
+        userId: userId,
       },
     });
   }
