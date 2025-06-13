@@ -28,22 +28,6 @@ export class PostService {
     });
   }
 
-  async getPostById(postId: number) {
-    const post = await this.prisma.post.findUnique({
-      where: { id: postId },
-      include: {
-        user: true,
-        comments: true,
-      },
-    });
-
-    if (!post) {
-      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
-    }
-
-    return post;
-  }
-
   async getPostDetail(postId: number) {
     const post = await this.prisma.post.findUnique({
       where: { id: postId },
