@@ -7,6 +7,8 @@ export const ErrorCode = {
   POST_NOT_FOUND: 'POST_NOT_FOUND',
   NO_PERMISSION: 'NO_PERMISSION',
   ALREADY_LIKED: 'ALREADY_LIKED',
+
+  COMMENT_NOT_FOUND: 'COMMENT_NOT_FOUND',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
