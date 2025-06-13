@@ -53,4 +53,25 @@ export class CommentService {
       orderBy: { createdAt: 'asc' },
     });
   }
+
+  async like(commentId: number, userId: string) {
+    const exists = await this.prisma.commentLike.findFirst({
+      where: { commentId, userId },
+    });
+    if (exists) {
+      throw new BusinessException(ErrorCode.ALREADY_LIKED, ErrorMessage.ALREADY_LIKED);
+    }
+
+    return this.prisma.commentLike.create({
+      data: { commentId, userId },
+    });
+  }
+
+  async unlike(commentId: number, userId: string) {
+    const like = await this.prisma.commentLike.findFirst({
+      where: { commentId, userId },
+    });
+
+    await this.prisma.commentLike.delete({ where: { id: like!.id } });
+  }
 }
