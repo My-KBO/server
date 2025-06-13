@@ -59,13 +59,15 @@ model PostLike {
 }
 
 model CommentLike {
-  id           Int       @id @default(autoincrement())
-  commentId    Int       @map("comment_id")
-  userId       String    @map("user_id")
-  createdAt    DateTime  @default(now()) @map("created_at")
+  id         Int      @id @default(autoincrement())
+  commentId  Int      @map("comment_id")
+  userId     String   @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  comment      Comment   @relation(fields: [commentId], references: [id])
-  user         User      @relation(fields: [userId], references: [id])
+  comment    Comment  @relation(fields: [commentId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, commentId], name: "userId_commentId")
 }
 
 model Team {
