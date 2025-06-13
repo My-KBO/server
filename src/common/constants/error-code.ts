@@ -4,8 +4,8 @@ export const ErrorCode = {
 
   User: {
     USER_NOT_FOUND: 'USER_001',
-    EMAIL_ALREADY_EXISTS: 'USER_002',
-    NO_PERMISSION: 'USER_003',
+    INVALID_PASSWORD: 'USER_002',
+    EMAIL_ALREADY_EXISTS: 'USER_003',
   },
 
   Post: {

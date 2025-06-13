@@ -12,7 +12,7 @@ export class UserService {
   private async getUserOrThrow(userId: string) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      throw new BusinessException(ErrorCode.USER_NOT_FOUND, ErrorMessage.USER_NOT_FOUND);
+      throw new BusinessException(ErrorCode.User.USER_NOT_FOUND, ErrorMessage.User.USER_NOT_FOUND);
     }
     return user;
   }
@@ -29,7 +29,7 @@ export class UserService {
     });
 
     if (!user) {
-      throw new BusinessException(ErrorCode.USER_NOT_FOUND, ErrorMessage.USER_NOT_FOUND);
+      throw new BusinessException(ErrorCode.User.USER_NOT_FOUND, ErrorMessage.User.USER_NOT_FOUND);
     }
 
     return user;

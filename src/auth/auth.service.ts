@@ -1,24 +1,27 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
+import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { BusinessException } from '../common/exceptions/business.exception';
+import { ErrorCode } from '../common/constants/error-code';
+import { ErrorMessage } from '../common/constants/error-message';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
   ) {}
 
-  async signup(dto: SignupDto) {
-    const hashed = await bcrypt.hash(dto.password, 10);
+  async signup(dto: SignupDto): Promise<{ id: string; email: string; nickname: string }> {
+    const hashedPassword = await this.hashPassword(dto.password);
 
     const user = await this.prisma.user.create({
       data: {
         email: dto.email,
-        password: hashed,
+        password: hashedPassword,
         nickname: dto.nickname,
         favoriteTeam: dto.favoriteTeam,
       },
@@ -31,17 +34,33 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginDto) {
+  async login(dto: LoginDto): Promise<{ accessToken: string }> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
-    if (!user) throw new UnauthorizedException('Invalid credentials');
 
-    const pwValid = await bcrypt.compare(dto.password, user.password);
-    if (!pwValid) throw new UnauthorizedException('Invalid credentials');
+    if (!user) {
+      throw new BusinessException(ErrorCode.User.USER_NOT_FOUND, ErrorMessage.User.USER_NOT_FOUND);
+    }
+
+    const isValid = await this.comparePassword(dto.password, user.password);
+    if (!isValid) {
+      throw new BusinessException(
+        ErrorCode.User.INVALID_PASSWORD,
+        ErrorMessage.User.INVALID_PASSWORD,
+      );
+    }
 
     const payload = { sub: user.id };
     const accessToken = this.jwtService.sign(payload);
     return { accessToken };
+  }
+
+  private async hashPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+
+  private async comparePassword(plain: string, hashed: string): Promise<boolean> {
+    return bcrypt.compare(plain, hashed);
   }
 }
