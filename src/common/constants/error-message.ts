@@ -6,4 +6,6 @@ export enum ErrorMessage {
   POST_NOT_FOUND = '게시글을 찾을 수 없습니다.',
   ALREADY_LIKED = '이미 추천한 게시글입니다.',
   NO_PERMISSION = '해당 작업을 수행할 권한이 없습니다.',
+
+  COMMENT_NOT_FOUND = '댓글을 찾을 수 없습니다.',
 }

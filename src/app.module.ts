@@ -9,10 +9,13 @@ import { HighlightModule } from './highlight/highlight.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { ConfigModule } from './config/config.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { CommentController } from './comment/comment.controller';
+import { ServiceController } from './service/service.controller';
+import { CommentService } from './comment/comment.service';
 
 @Module({
   imports: [UserModule, PostModule, AuthModule, BaseballModule, HighlightModule, ScheduleModule, ConfigModule, PrismaModule],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, CommentController, ServiceController],
+  providers: [AppService, CommentService],
 })
 export class AppModule {}
