@@ -10,12 +10,22 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { ConfigModule } from './config/config.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommentController } from './comment/comment.controller';
-import { ServiceController } from './service/service.controller';
 import { CommentService } from './comment/comment.service';
+import { CommentModule } from './comment/comment.module';
 
 @Module({
-  imports: [UserModule, PostModule, AuthModule, BaseballModule, HighlightModule, ScheduleModule, ConfigModule, PrismaModule],
-  controllers: [AppController, CommentController, ServiceController],
+  imports: [
+    UserModule,
+    PostModule,
+    AuthModule,
+    BaseballModule,
+    HighlightModule,
+    ScheduleModule,
+    ConfigModule,
+    PrismaModule,
+    CommentModule,
+  ],
+  controllers: [AppController, CommentController],
   providers: [AppService, CommentService],
 })
 export class AppModule {}
