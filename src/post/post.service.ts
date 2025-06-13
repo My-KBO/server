@@ -44,6 +44,44 @@ export class PostService {
     return post;
   }
 
+  async getPostDetail(postId: number) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        user: {
+          select: { id: true, nickname: true },
+        },
+        comments: {
+          select: {
+            id: true,
+            content: true,
+            createdAt: true,
+            user: {
+              select: { id: true, nickname: true },
+            },
+          },
+          orderBy: { createdAt: 'asc' },
+        },
+        _count: {
+          select: {
+            comments: true,
+            likes: true,
+          },
+        },
+      },
+    });
+
+    if (!post) {
+      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+    }
+
+    return {
+      ...post,
+      likesCount: post._count.likes,
+      commentsCount: post._count.comments,
+    };
+  }
+
   async updatePost(userId: string, postId: number, dto: UpdatePostDto) {
     const post = await this.getPostOrThrow(postId);
 
