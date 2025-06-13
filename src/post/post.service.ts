@@ -1,14 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePostDto, UpdatePostDto } from './dto';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { ErrorCode } from '../common/exceptions/error-code';
+import { ErrorCode } from '../common/constants/error-code';
+import { ErrorMessage } from '../common/constants/error-message';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(userId: string, dto: CreatePostDto) {
+  private async getPostOrThrow(postId: number) {
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+    }
+    return post;
+  }
+
+  async createPost(userId: string, dto: CreatePostDto) {
     return this.prisma.post.create({
       data: {
         userId,
@@ -18,31 +28,31 @@ export class PostService {
     });
   }
 
-  async findOne(id: number) {
+  async getPostById(postId: number) {
     const post = await this.prisma.post.findUnique({
-      where: { id },
+      where: { id: postId },
       include: {
-        user: {
-          select: {
-            id: true,
-            nickname: true,
-          },
-        },
+        user: true,
         comments: true,
-        likes: true,
       },
     });
-    if (!post) throw new BusinessException(ErrorCode.POST_NOT_FOUND);
+
+    if (!post) {
+      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+    }
+
     return post;
   }
 
-  async update(userId: string, id: number, dto: UpdatePostDto) {
-    const post = await this.prisma.post.findUnique({ where: { id } });
-    if (!post) throw new BusinessException(ErrorCode.POST_NOT_FOUND);
-    if (post.userId !== userId) throw new BusinessException(ErrorCode.NO_PERMISSION);
+  async updatePost(userId: string, postId: number, dto: UpdatePostDto) {
+    const post = await this.getPostOrThrow(postId);
+
+    if (post.userId !== userId) {
+      throw new BusinessException(ErrorCode.NO_PERMISSION, ErrorMessage.NO_PERMISSION);
+    }
 
     return this.prisma.post.update({
-      where: { id },
+      where: { id: postId },
       data: {
         title: dto.title,
         content: dto.content,
@@ -50,26 +60,25 @@ export class PostService {
     });
   }
 
-  async remove(userId: string, id: number) {
-    const post = await this.prisma.post.findUnique({ where: { id } });
-    if (!post) throw new BusinessException(ErrorCode.POST_NOT_FOUND);
-    if (post.userId !== userId) throw new BusinessException(ErrorCode.NO_PERMISSION);
+  async deletePost(userId: string, postId: number) {
+    const post = await this.getPostOrThrow(postId);
 
-    await this.prisma.post.delete({ where: { id } });
+    if (post.userId !== userId) {
+      throw new BusinessException(ErrorCode.NO_PERMISSION, ErrorMessage.NO_PERMISSION);
+    }
+
+    await this.prisma.post.delete({ where: { id: postId } });
   }
 
-  async toggleLike(userId: string, postId: number) {
+  async likePost(userId: string, postId: number) {
+    const post = await this.getPostOrThrow(postId);
+
     const existing = await this.prisma.postLike.findFirst({
       where: { postId, userId },
     });
 
     if (existing) {
-      await this.prisma.postLike.delete({ where: { id: existing.id } });
-      await this.prisma.post.update({
-        where: { id: postId },
-        data: { likesCount: { decrement: 1 } },
-      });
-      return { liked: false };
+      throw new BusinessException(ErrorCode.ALREADY_LIKED, ErrorMessage.ALREADY_LIKED);
     }
 
     await this.prisma.postLike.create({
@@ -78,9 +87,9 @@ export class PostService {
 
     await this.prisma.post.update({
       where: { id: postId },
-      data: { likesCount: { increment: 1 } },
+      data: {
+        likesCount: { increment: 1 },
+      },
     });
-
-    return { liked: true };
   }
 }
