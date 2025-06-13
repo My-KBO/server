@@ -14,7 +14,7 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User as UserDecorator } from '../user/decorator/user.decorator';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiOkResponse } from '@nestjs/swagger';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -29,11 +29,13 @@ export class PostController {
     return this.postService.createPost(userId, dto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
-  @ApiOperation({ summary: '게시글 단일 조회' })
+  @ApiOperation({ summary: '게시글 조회 ' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
-  getPostById(@Param('id', ParseIntPipe) id: number) {
-    return this.postService.getPostById(id);
+  @ApiOkResponse({ description: '게시글 상세 정보 반환' })
+  getPostDetail(@Param('id', ParseIntPipe) postId: number) {
+    return this.postService.getPostDetail(postId);
   }
 
   @Patch(':id')
