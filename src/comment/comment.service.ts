@@ -13,7 +13,7 @@ export class CommentService {
   async create(userId: string, dto: CreateCommentDto) {
     const post = await this.prisma.post.findUnique({ where: { id: dto.postId } });
     if (!post) {
-      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+      throw new BusinessException(ErrorCode.Post.POST_NOT_FOUND, ErrorMessage.Post.POST_NOT_FOUND);
     }
 
     return this.prisma.comment.create({
@@ -28,7 +28,10 @@ export class CommentService {
   async update(userId: string, commentId: number, dto: UpdateCommentDto) {
     const comment = await this.prisma.comment.findUnique({ where: { id: commentId } });
     if (!comment || comment.userId !== userId) {
-      throw new BusinessException(ErrorCode.COMMENT_NOT_FOUND, ErrorMessage.COMMENT_NOT_FOUND);
+      throw new BusinessException(
+        ErrorCode.Comment.COMMENT_NOT_FOUND,
+        ErrorMessage.Comment.COMMENT_NOT_FOUND,
+      );
     }
 
     return this.prisma.comment.update({
@@ -40,7 +43,10 @@ export class CommentService {
   async delete(userId: string, commentId: number) {
     const comment = await this.prisma.comment.findUnique({ where: { id: commentId } });
     if (!comment || comment.userId !== userId) {
-      throw new BusinessException(ErrorCode.COMMENT_NOT_FOUND, ErrorMessage.COMMENT_NOT_FOUND);
+      throw new BusinessException(
+        ErrorCode.Comment.COMMENT_NOT_FOUND,
+        ErrorMessage.Comment.COMMENT_NOT_FOUND,
+      );
     }
 
     return this.prisma.comment.delete({ where: { id: commentId } });
@@ -59,7 +65,10 @@ export class CommentService {
       where: { commentId, userId },
     });
     if (exists) {
-      throw new BusinessException(ErrorCode.ALREADY_LIKED, ErrorMessage.ALREADY_LIKED);
+      throw new BusinessException(
+        ErrorCode.Comment.ALREADY_LIKED,
+        ErrorMessage.Comment.ALREADY_LIKED,
+      );
     }
 
     return this.prisma.commentLike.create({
@@ -72,6 +81,13 @@ export class CommentService {
       where: { commentId, userId },
     });
 
-    await this.prisma.commentLike.delete({ where: { id: like!.id } });
+    if (!like) {
+      throw new BusinessException(
+        ErrorCode.Comment.LIKE_NOT_FOUND,
+        ErrorMessage.Comment.LIKE_NOT_FOUND,
+      );
+    }
+
+    await this.prisma.commentLike.delete({ where: { id: like.id } });
   }
 }
