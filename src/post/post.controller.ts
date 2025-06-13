@@ -1,21 +1,44 @@
 import { Controller, Post, Body, UseGuards } from '@nestjs/common';
-import { PostsService } from './post.service';
+import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { User } from '../user/decorator/user.decorator';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-@ApiTags('Posts')
+@@ApiTags('게시글')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 @Controller('api/v1/posts')
-export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+export class PostController {
+  constructor(private readonly postService: PostService) {}
 
-  @Post()
-  @ApiOperation({ summary: '게시글 작성' })
-  @ApiResponse({ status: 201, description: '게시글 생성 성공' })
+  @ApiOperation({ summary: '게시글 생성' })
+  @HttpPost()
   create(@User('id') userId: string, @Body() dto: CreatePostDto) {
-    return this.postsService.create(userId, dto);
+    return this.postService.create(userId, dto);
+  }
+
+  @ApiOperation({ summary: '게시글 단일 조회' })
+  @Get(':id')
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.postService.findOne(id);
+  }
+
+  @ApiOperation({ summary: '게시글 수정' })
+  @Patch(':id')
+  update(@User('id') userId: string, @Param('id', ParseIntPipe) id: number, @Body() dto: UpdatePostDto) {
+    return this.postService.update(userId, id, dto);
+  }
+
+  @ApiOperation({ summary: '게시글 삭제' })
+  @Delete(':id')
+  remove(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
+    return this.postService.remove(userId, id);
+  }
+
+  @ApiOperation({ summary: '게시글 좋아요 토글' })
+  @Post(':id/like')
+  toggleLike(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
+    return this.postService.toggleLike(userId, id);
   }
 }
