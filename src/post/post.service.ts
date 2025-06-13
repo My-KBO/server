@@ -13,7 +13,7 @@ export class PostService {
   private async getPostOrThrow(postId: number) {
     const post = await this.prisma.post.findUnique({ where: { id: postId } });
     if (!post) {
-      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+      throw new BusinessException(ErrorCode.Post.POST_NOT_FOUND, ErrorMessage.Post.POST_NOT_FOUND);
     }
     return post;
   }
@@ -56,7 +56,7 @@ export class PostService {
     });
 
     if (!post) {
-      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+      throw new BusinessException(ErrorCode.Post.POST_NOT_FOUND, ErrorMessage.Post.POST_NOT_FOUND);
     }
 
     return {
@@ -70,7 +70,7 @@ export class PostService {
     const post = await this.getPostOrThrow(postId);
 
     if (post.userId !== userId) {
-      throw new BusinessException(ErrorCode.NO_PERMISSION, ErrorMessage.NO_PERMISSION);
+      throw new BusinessException(ErrorCode.Post.NO_PERMISSION, ErrorMessage.Post.NO_PERMISSION);
     }
 
     return this.prisma.post.update({
@@ -86,7 +86,7 @@ export class PostService {
     const post = await this.getPostOrThrow(postId);
 
     if (post.userId !== userId) {
-      throw new BusinessException(ErrorCode.NO_PERMISSION, ErrorMessage.NO_PERMISSION);
+      throw new BusinessException(ErrorCode.Post.NO_PERMISSION, ErrorMessage.Post.NO_PERMISSION);
     }
 
     await this.prisma.post.delete({ where: { id: postId } });
@@ -100,7 +100,10 @@ export class PostService {
     });
 
     if (existing) {
-      throw new BusinessException(ErrorCode.ALREADY_LIKED, ErrorMessage.ALREADY_LIKED);
+      throw new BusinessException(
+        ErrorCode.Post.POST_ALREADY_LIKED,
+        ErrorMessage.Post.POST_ALREADY_LIKED,
+      );
     }
 
     await this.prisma.postLike.create({

@@ -10,27 +10,28 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const res = ctx.getResponse<Response>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let code: string = ErrorCode.INTERNAL_SERVER_ERROR;
+    let code = ErrorCode.INTERNAL_SERVER_ERROR;
     let message = '서버 내부 오류';
 
+    // 비즈니스 예외 처리
     if (exception instanceof BusinessException) {
       code = exception.code;
       message = exception.message;
+      status = this.mapErrorCodeToStatus(code);
 
-      switch (code) {
-        case ErrorCode.USER_NOT_FOUND:
-          status = HttpStatus.NOT_FOUND;
-          break;
-        case ErrorCode.EMAIL_ALREADY_EXISTS:
-          status = HttpStatus.CONFLICT;
-          break;
-        default:
-          status = HttpStatus.BAD_REQUEST;
-      }
+      // HttpException 처리
     } else if (exception instanceof HttpException) {
       status = exception.getStatus();
       const response = exception.getResponse();
-      message = typeof response === 'string' ? response : (response as any).message;
+
+      // 메시지가 string | string[] | object 형태로 나올 수 있음
+      if (typeof response === 'string') {
+        message = response;
+      } else if (Array.isArray((response as any).message)) {
+        message = (response as any).message.join(', ');
+      } else {
+        message = (response as any).message || message;
+      }
     }
 
     res.status(status).json({
@@ -40,5 +41,25 @@ export class AllExceptionsFilter implements ExceptionFilter {
       message,
       timestamp: new Date().toISOString(),
     });
+  }
+
+  private mapErrorCodeToStatus(code: string): number {
+    switch (code) {
+      case ErrorCode.User.USER_NOT_FOUND:
+      case ErrorCode.Post.POST_NOT_FOUND:
+      case ErrorCode.Comment.COMMENT_NOT_FOUND:
+        return HttpStatus.NOT_FOUND;
+
+      case ErrorCode.User.EMAIL_ALREADY_EXISTS:
+      case ErrorCode.Post.POST_ALREADY_LIKED:
+      case ErrorCode.Comment.COMMENT_ALREADY_LIKED:
+        return HttpStatus.CONFLICT;
+
+      case ErrorCode.UNAUTHORIZED_ACTION:
+        return HttpStatus.UNAUTHORIZED;
+
+      default:
+        return HttpStatus.BAD_REQUEST;
+    }
   }
 }
