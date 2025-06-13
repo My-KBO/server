@@ -1,4 +1,95 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { BusinessException } from '../common/exceptions/business.exception';
+import { ErrorCode } from '../common/constants/error-code';
+import { ErrorMessage } from '../common/constants/error-message';
 
 @Injectable()
-export class PostService {}
+export class PostService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  private async getPostOrThrow(postId: number) {
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
+    if (!post) {
+      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+    }
+    return post;
+  }
+
+  async createPost(userId: string, dto: CreatePostDto) {
+    return this.prisma.post.create({
+      data: {
+        userId,
+        title: dto.title,
+        content: dto.content,
+      },
+    });
+  }
+
+  async getPostById(postId: number) {
+    const post = await this.prisma.post.findUnique({
+      where: { id: postId },
+      include: {
+        user: true,
+        comments: true,
+      },
+    });
+
+    if (!post) {
+      throw new BusinessException(ErrorCode.POST_NOT_FOUND, ErrorMessage.POST_NOT_FOUND);
+    }
+
+    return post;
+  }
+
+  async updatePost(userId: string, postId: number, dto: UpdatePostDto) {
+    const post = await this.getPostOrThrow(postId);
+
+    if (post.userId !== userId) {
+      throw new BusinessException(ErrorCode.NO_PERMISSION, ErrorMessage.NO_PERMISSION);
+    }
+
+    return this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        title: dto.title,
+        content: dto.content,
+      },
+    });
+  }
+
+  async deletePost(userId: string, postId: number) {
+    const post = await this.getPostOrThrow(postId);
+
+    if (post.userId !== userId) {
+      throw new BusinessException(ErrorCode.NO_PERMISSION, ErrorMessage.NO_PERMISSION);
+    }
+
+    await this.prisma.post.delete({ where: { id: postId } });
+  }
+
+  async likePost(userId: string, postId: number) {
+    const post = await this.getPostOrThrow(postId);
+
+    const existing = await this.prisma.postLike.findFirst({
+      where: { postId, userId },
+    });
+
+    if (existing) {
+      throw new BusinessException(ErrorCode.ALREADY_LIKED, ErrorMessage.ALREADY_LIKED);
+    }
+
+    await this.prisma.postLike.create({
+      data: { postId, userId },
+    });
+
+    await this.prisma.post.update({
+      where: { id: postId },
+      data: {
+        likesCount: { increment: 1 },
+      },
+    });
+  }
+}

@@ -3,6 +3,10 @@ export const ErrorCode = {
   EMAIL_ALREADY_EXISTS: 'EMAIL_ALREADY_EXISTS',
   INVALID_PASSWORD: 'INVALID_PASSWORD',
   INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+
+  POST_NOT_FOUND: 'POST_NOT_FOUND',
+  NO_PERMISSION: 'NO_PERMISSION',
+  ALREADY_LIKED: 'ALREADY_LIKED',
 } as const;
 
 export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
