@@ -45,6 +45,25 @@ export class CommentController {
     return this.commentService.delete(userId, commentId);
   }
 
+  @Post(':commentId/like')
+  @ApiOperation({ summary: '댓글 좋아요 추가' })
+  async likeComment(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @UserDecorator('id') userId: string,
+  ) {
+    return this.commentService.like(commentId, userId);
+  }
+
+  @Delete(':commentId/like')
+  @ApiOperation({ summary: '댓글 좋아요 취소' })
+  @HttpCode(204)
+  async unlikeComment(
+    @Param('commentId', ParseIntPipe) commentId: number,
+    @UserDecorator('id') userId: string,
+  ) {
+    return this.commentService.unlike(commentId, userId);
+  }
+
   @Get('post/:postId')
   @ApiOperation({ summary: '게시글의 댓글 목록 조회' })
   findByPost(@Param('postId', ParseIntPipe) postId: number) {
