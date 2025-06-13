@@ -2,6 +2,10 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { Response } from 'express';
 import { BusinessException } from '../exceptions/business.exception';
 import { ErrorCode } from '../constants/error-code';
+import {
+  PrismaClientKnownRequestError,
+  PrismaClientValidationError,
+} from '@prisma/client/runtime/library';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -12,6 +16,13 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code = ErrorCode.INTERNAL_SERVER_ERROR;
     let message = '서버 내부 오류';
+
+    if (
+      exception instanceof PrismaClientKnownRequestError ||
+      exception instanceof PrismaClientValidationError
+    ) {
+      console.error('Prisma Error:', exception);
+    }
 
     // 비즈니스 예외 처리
     if (exception instanceof BusinessException) {
