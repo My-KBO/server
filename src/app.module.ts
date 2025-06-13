@@ -9,8 +9,6 @@ import { HighlightModule } from './highlight/highlight.module';
 import { ScheduleModule } from './schedule/schedule.module';
 import { ConfigModule } from './config/config.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { CommentController } from './comment/comment.controller';
-import { CommentService } from './comment/comment.service';
 import { CommentModule } from './comment/comment.module';
 
 @Module({
@@ -25,7 +23,7 @@ import { CommentModule } from './comment/comment.module';
     PrismaModule,
     CommentModule,
   ],
-  controllers: [AppController, CommentController],
-  providers: [AppService, CommentService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
