@@ -12,7 +12,7 @@ import { ConfigModule } from '@nestjs/config';
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,
-      signOptions: { expiresIn: '15m' }, // TODO : 임시 유효시간 등록, 액세스 토큰 유효시간 정해야함.
+      signOptions: { expiresIn: '1h' }, // TODO : 임시 유효시간 등록, 액세스 토큰 유효시간 정해야함.
     }),
   ],
   controllers: [AuthController],

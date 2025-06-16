@@ -8,6 +8,7 @@ import {
   Body,
   UseGuards,
   ParseIntPipe,
+  Put,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -37,7 +38,7 @@ export class PostController {
     return this.postService.getPostDetail(postId);
   }
 
-  @Patch(':id')
+  @Put(':id')
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   updatePost(
