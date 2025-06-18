@@ -5,8 +5,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { ErrorCode } from '../common/constants/error-code';
-import { ErrorMessage } from '../common/constants/error-message';
+import { ErrorCode } from '../common/constants/error/error-code';
+import { ErrorMessage } from '../common/constants/error/error-message';
 
 @Injectable()
 export class AuthService {

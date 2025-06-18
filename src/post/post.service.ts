@@ -3,8 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { ErrorCode } from '../common/constants/error-code';
-import { ErrorMessage } from '../common/constants/error-message';
+import { ErrorCode } from '../common/constants/error/error-code';
+import { ErrorMessage } from '../common/constants/error/error-message';
 
 @Injectable()
 export class PostService {
@@ -19,13 +19,12 @@ export class PostService {
   }
 
   async createPost(userId: string, dto: CreatePostDto) {
-    console.log('[CreatePost]', { userId, title: dto.title });
     return this.prisma.post.create({
       data: {
+        userId,
         title: dto.title,
         content: dto.content,
-        userId: userId,
-      },
+        category: dto.category,
     });
   }
 
@@ -68,10 +67,14 @@ export class PostService {
   }
 
   async updatePost(userId: string, postId: number, dto: UpdatePostDto) {
-    const post = await this.getPostOrThrow(postId);
+    const post = await this.prisma.post.findUnique({ where: { id: postId } });
+
+    if (!post) {
+      throw new BusinessException(ErrorCode.Post.POST_NOT_FOUND, ErrorMessage.Post.POST_NOT_FOUND);
+    }
 
     if (post.userId !== userId) {
-      throw new BusinessException(ErrorCode.Post.NO_PERMISSION, ErrorMessage.Post.NO_PERMISSION);
+      throw new BusinessException(ErrorCode.Post.ACCESS_DENIED, ErrorMessage.Post.ACCESS_DENIED);
     }
 
     return this.prisma.post.update({
@@ -79,6 +82,7 @@ export class PostService {
       data: {
         title: dto.title,
         content: dto.content,
+        category: dto.category, 
       },
     });
   }
