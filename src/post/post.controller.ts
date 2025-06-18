@@ -9,6 +9,7 @@ import {
   UseGuards,
   ParseIntPipe,
   Put,
+  Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -16,6 +17,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../user/decorator/user.decorator';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiOkResponse } from '@nestjs/swagger';
+import { PostCategory } from 'src/common/constants/post-category.enum';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -36,6 +38,17 @@ export class PostController {
   @ApiOkResponse({ description: '게시글 상세 정보 반환' })
   getPostDetail(@Param('id', ParseIntPipe) postId: number) {
     return this.postService.getPostDetail(postId);
+  }
+
+  @Get()
+  @ApiOperation({ summary: '게시글 목록 조회 (검색, 카테고리, 페이징)' })
+  getPosts(
+    @Query('category') category?: PostCategory,
+    @Query('search') search?: string,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
+  ) {
+    return this.postService.getPosts({ category, search, page, limit });
   }
 
   @Put(':id')
