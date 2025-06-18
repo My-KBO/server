@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { ErrorCode } from '../common/constants/error-code';
-import { ErrorMessage } from '../common/constants/error-message';
+import { ErrorCode } from '../common/constants/error/error-code';
+import { ErrorMessage } from '../common/constants/error/error-message';
 
 @Injectable()
 export class UserService {

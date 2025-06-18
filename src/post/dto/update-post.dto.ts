@@ -1,5 +1,6 @@
-import { IsOptional, IsString, Length } from 'class-validator';
+import { IsEnum, IsOptional, IsString, Length } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
+import { PostCategory } from 'src/common/constants/post-category.enum';
 
 export class UpdatePostDto {
   @ApiPropertyOptional()
@@ -12,4 +13,9 @@ export class UpdatePostDto {
   @IsOptional()
   @IsString()
   content?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsEnum(PostCategory)
+  category: PostCategory;
 }

@@ -13,6 +13,7 @@ export const ErrorCode = {
     NO_PERMISSION: 'POST_002',
     POST_ALREADY_LIKED: 'POST_003',
     POST_LIKE_NOT_FOUND: 'POST_004',
+    ACCESS_DENIED: 'POST_005',
   },
 
   Comment: {

@@ -3,8 +3,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { ErrorCode } from '../common/constants/error-code';
-import { ErrorMessage } from '../common/constants/error-message';
+import { ErrorCode } from '../common/constants/error/error-code';
+import { ErrorMessage } from '../common/constants/error/error-message';
 
 @Injectable()
 export class CommentService {
