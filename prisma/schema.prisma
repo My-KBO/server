@@ -21,18 +21,35 @@ model User {
   commentLikes   CommentLike[]
 }
 
-model Post {
-  id           Int       @id @default(autoincrement())
-  userId       String    @map("user_id")
-  title        String
-  content      String
-  likesCount   Int       @default(0) @map("likes_count")
-  createdAt    DateTime  @default(now()) @map("created_at")
-  updatedAt    DateTime  @updatedAt      @map("updated_at")
+enum PostCategory {
+  GENERAL   
+  FREE        
+  LG
+  KIA
+  SSG
+  NC
+  DOOSAN
+  LOTTE
+  SAMSUNG
+  HANHWA
+  KT
+  KIWOOM
+}
 
-  user         User      @relation(fields: [userId], references: [id])
-  comments     Comment[]
-  likes        PostLike[]
+
+model Post {
+  id          Int           @id @default(autoincrement())
+  userId      String        @map("user_id")
+  title       String
+  content     String
+  category    PostCategory  @default(GENERAL)
+  likesCount  Int           @default(0) @map("likes_count")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt      @map("updated_at")
+
+  user        User          @relation(fields: [userId], references: [id])
+  comments    Comment[]
+  likes       PostLike[]
 }
 
 model Comment {
