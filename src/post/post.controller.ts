@@ -16,7 +16,14 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { User } from '../user/decorator/user.decorator';
-import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiOkResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiOkResponse,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { PostCategory } from 'src/common/constants/post-category.enum';
 
 @ApiTags('Post')
@@ -42,11 +49,15 @@ export class PostController {
 
   @Get()
   @ApiOperation({ summary: '게시글 목록 조회 (검색, 카테고리, 페이징)' })
+  @ApiQuery({ name: 'category', enum: PostCategory, required: false })
+  @ApiQuery({ name: 'search', type: String, required: false })
+  @ApiQuery({ name: 'page', type: Number, required: false })
+  @ApiQuery({ name: 'limit', type: Number, required: false })
   getPosts(
     @Query('category') category?: PostCategory,
     @Query('search') search?: string,
     @Query('page', ParseIntPipe) page = 1,
-    @Query('limit', ParseIntPipe) limit = 10,
+    @Query('limit', ParseIntPipe) limit = 20,
   ) {
     return this.postService.getPosts({ category, search, page, limit });
   }
