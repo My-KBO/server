@@ -42,7 +42,7 @@ model Post {
   userId      String        @map("user_id")
   title       String
   content     String
-  views        Int          @default(0)
+  views         Int           @default(0)
   category    PostCategory  @default(GENERAL)
   likesCount  Int           @default(0) @map("likes_count")
   createdAt   DateTime      @default(now()) @map("created_at")

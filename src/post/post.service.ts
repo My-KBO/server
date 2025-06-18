@@ -74,7 +74,11 @@ export class PostService {
     ]);
 
     return {
-      data: posts,
+      data: posts.map((post) => ({
+        ...post,
+        commentsCount: post._count.comments,
+        likesCount: post._count.likes,
+      })),
       meta: {
         total,
         page,
@@ -84,8 +88,9 @@ export class PostService {
   }
 
   async getPostDetail(postId: number) {
-    const post = await this.prisma.post.findUnique({
+    const post = await this.prisma.post.update({
       where: { id: postId },
+      data: { views: { increment: 1 } },
       include: {
         user: { select: { id: true, nickname: true } },
         comments: {
