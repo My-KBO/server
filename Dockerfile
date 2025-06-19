@@ -2,18 +2,17 @@ FROM node:18
 
 WORKDIR /app
 
-# 패키지 설치
+# 설치 전 schema 파일 먼저 복사해서 캐시 무효화
+COPY prisma ./prisma
 COPY package*.json ./
+
 RUN npm install
 
-# 소스 코드 및 prisma 파일 복사
+# 전체 소스 복사
 COPY . .
 
-# Prisma client 생성
+# 이 시점에 schema.prisma가 존재하므로 generate가 유효하게 작동함
 RUN npx prisma generate
-
-# NestJS 빌드
 RUN npm run build
 
-# 앱 실행
 CMD ["node", "dist/main"]
