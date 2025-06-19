@@ -6,7 +6,6 @@ export class UpdatePostDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  @Length(1, 100)
   title?: string;
 
   @ApiPropertyOptional()

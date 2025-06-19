@@ -121,17 +121,19 @@ export class PostService {
 
   async updatePost(userId: string, postId: number, dto: UpdatePostDto) {
     const post = await this.getPostOrThrow(postId);
+
     if (post.userId !== userId) {
       throw new BusinessException(ErrorCode.Post.ACCESS_DENIED, ErrorMessage.Post.ACCESS_DENIED);
     }
 
+    const updateData: Partial<UpdatePostDto> = {};
+    if (dto.title !== undefined) updateData.title = dto.title;
+    if (dto.content !== undefined) updateData.content = dto.content;
+    if (dto.category !== undefined) updateData.category = dto.category;
+
     return this.prisma.post.update({
       where: { id: postId },
-      data: {
-        title: dto.title,
-        content: dto.content,
-        category: dto.category,
-      },
+      data: updateData,
     });
   }
 

@@ -62,7 +62,7 @@ export class PostController {
     return this.postService.getPosts({ category, search, page, limit });
   }
 
-  @Put(':id')
+  @Patch(':id')
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   updatePost(
