@@ -1,32 +1,36 @@
-name: Deploy to EC2
+name: Deploy to EC2 (Dev)
 
 on:
   push:
-    branches: [main]
+    branches:
+      - dev
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Set up SSH key
+      - name: Add SSH private key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Add EC2 to known hosts
+      - name: Add known hosts
         run: |
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to EC2 via SSH
+      - name: Copy files to EC2
         run: |
-          ssh ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
-            cd /home/${{ secrets.EC2_USERNAME }}/my-kbo-server
-            git pull origin main
-            docker compose down
-            docker compose up --build -d
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./ ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }}:/home/${{ secrets.EC2_USERNAME }}/server
+
+      - name: Run Docker Compose on EC2
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} << 'EOF'
+            cd $(dirname "${{ secrets.DOCKER_COMPOSE_PATH }}")
+            docker compose down || true
+            docker compose up -d --build
           EOF
