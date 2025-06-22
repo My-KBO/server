@@ -13,6 +13,9 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
+      - name: test
+        run: echo "${{ secrets.TEST }}"
+
       - name: Add SSH private key
         run: |
           mkdir -p ~/.ssh
