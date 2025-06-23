@@ -20,7 +20,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
       - name: Copy env file
-        run: scp -i ~/.ssh/id_rsa ./server/.env ubuntu@${EC2_PUBLIC_IP}:/home/ubuntu/server/.env
+        run: scp -i ~/.ssh/id_rsa ./server/.env ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/server/.env
 
       - name: Add known hosts
         run: |
