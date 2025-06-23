@@ -19,6 +19,9 @@ jobs:
           echo "${{ secrets.EC2_KEY }}" | base64 -d > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+      - name: Copy env file
+        run: scp -i ~/.ssh/id_rsa ./server/.env ubuntu@${EC2_PUBLIC_IP}:/home/ubuntu/server/.env
+
       - name: Add known hosts
         run: |
           ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
