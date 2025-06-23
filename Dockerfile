@@ -14,4 +14,8 @@ RUN npm run build
 
 RUN npx prisma generate
 
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+ENTRYPOINT ["/app/entrypoint.sh"]
+
 CMD ["node", "dist/main"]
