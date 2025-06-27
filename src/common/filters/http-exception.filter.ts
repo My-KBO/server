@@ -55,6 +55,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       case ErrorCode.Comment.COMMENT_ALREADY_LIKED:
         return HttpStatus.CONFLICT;
 
+      case ErrorCode.Post.NO_PERMISSION:
+      case ErrorCode.Post.ACCESS_DENIED:
+        return HttpStatus.FORBIDDEN;
+
       case ErrorCode.UNAUTHORIZED_ACTION:
         return HttpStatus.UNAUTHORIZED;
 
