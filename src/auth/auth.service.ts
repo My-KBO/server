@@ -71,8 +71,8 @@ export class AuthService {
 
     if (!user || user.refreshToken !== oldRefreshToken) {
       throw new BusinessException(
-        ErrorCode.Auth.INVALID_REFRESH_TOKEN,
-        ErrorMessage.Auth.INVALID_REFRESH_TOKEN,
+        ErrorCode.User.INVALID_REFRESH_TOKEN,
+        ErrorMessage.User.INVALID_REFRESH_TOKEN,
       );
     }
 
