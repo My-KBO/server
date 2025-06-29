@@ -1,8 +1,10 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Res, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
+import { Response, Request } from 'express';
+import { User } from 'src/user/decorator/user.decorator';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -17,7 +19,46 @@ export class AuthController {
 
   @Post('login')
   @ApiOperation({ summary: '로그인' })
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+    const { accessToken, refreshToken } = await this.authService.login(dto);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      path: '/api/v1/auth/refresh',
+      sameSite: 'strict',
+      secure: true,
+    });
+
+    return { accessToken };
+  }
+
+  @Post('refresh')
+  @ApiOperation({ summary: 'Access Token 재발급' })
+  async refresh(
+    @User('id') userId: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const oldRefreshToken = req.cookies['refreshToken'];
+
+    const { accessToken, refreshToken } = await this.authService.refresh(userId, oldRefreshToken);
+
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      path: '/api/v1/auth/refresh',
+      sameSite: 'strict',
+      secure: true,
+    });
+
+    return { accessToken };
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: '로그아웃' })
+  async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+    const oldRefreshToken = req.cookies?.refreshToken;
+    await this.authService.logout(oldRefreshToken);
+    res.clearCookie('refreshToken');
+    return { message: 'Logout success' };
   }
 }

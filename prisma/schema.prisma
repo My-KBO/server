@@ -14,6 +14,7 @@ model User {
   nickname       String
   favoriteTeam   String?  @map("favorite_team")
   createdAt      DateTime @default(now()) @map("created_at")
+  refreshToken String?  @map("refresh_token")
 
   posts          Post[]
   comments       Comment[]
