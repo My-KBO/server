@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Response, Request } from 'express';
+import { User } from 'src/user/decorator/user.decorator';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -33,9 +34,12 @@ export class AuthController {
 
   @Post('refresh')
   @ApiOperation({ summary: 'Access Token 재발급' })
-  async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async refresh(
+    @User('id') userId: string,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const oldRefreshToken = req.cookies['refreshToken'];
-    const userId = (req as any).user?.sub;
 
     const { accessToken, refreshToken } = await this.authService.refresh(userId, oldRefreshToken);
 
