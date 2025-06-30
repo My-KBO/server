@@ -93,7 +93,6 @@ model Schedule {
   id         Int     @id @default(autoincrement())
   date       String
   time       String
-  game       String
   homeTeam   String
   homeScore  String
   awayTeam   String
@@ -102,7 +101,7 @@ model Schedule {
   stadium    String
   note       String
 
-  @@unique([date, time, game])
+  @@unique([date, time, stadium])
 }
 
 model TeamRank {
