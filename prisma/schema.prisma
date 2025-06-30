@@ -89,44 +89,42 @@ model CommentLike {
   @@unique([userId, commentId], name: "userId_commentId")
 }
 
-model TeamRank {
-  id       Int     @id @default(autoincrement())
-  rank     Int
-  team     String
-  games    Int
-  win      Int
-  lose     Int
-  draw     Int
-  winRate  Float
-  gameGap  String
-  streak   String
-
-  @@map("team_rank")
-}
-
-model PlayerStat {
-  id       Int    @id @default(autoincrement())
-  category String
-  name     String
-  team     String
-  value    String
-
-  @@map("player_stat")
-}
-
-model GameSchedule {
+model Schedule {
   id         Int     @id @default(autoincrement())
   date       String
   time       String
   game       String
   homeTeam   String
-  homeScore  String?
+  homeScore  String
   awayTeam   String
-  awayScore  String?
+  awayScore  String
   tv         String
   stadium    String
   note       String
 
-  @@map("game_schedule")
+  @@unique([date, time, game])
+}
+
+model TeamRank {
+  id        Int     @id @default(autoincrement())
+  rank      Int
+  team      String  @unique
+  games     Int
+  win       Int
+  lose      Int
+  draw      Int
+  winRate   Float
+  gameGap   String
+  streak    String
+}
+
+model PlayerStat {
+  id       Int     @id @default(autoincrement())
+  category String
+  name     String
+  team     String
+  value    String
+
+  @@unique([category, name, team])
 }
 
