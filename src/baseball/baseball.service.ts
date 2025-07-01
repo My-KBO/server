@@ -5,7 +5,7 @@ import { TeamRankingDto } from './dto/team-ranking.dto';
 import { TodayGameDto } from './dto/today-games.dto';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { fetchWeatherByStadium } from 'src/common/weather/get-weather';
+import { fetchWeatherByStadium } from '../common/weather/get-weather';
 
 @Injectable()
 export class BaseballService {
