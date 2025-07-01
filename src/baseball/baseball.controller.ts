@@ -1,30 +1,25 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseballService } from './baseball.service';
+import { TeamRankingDto } from './dto/team-ranking.dto';
+import { GetTopPlayersResponseDto } from './dto/top-player.dto';
 
 @ApiTags('baseball')
 @Controller('api/v1/baseball')
 export class BaseballController {
   constructor(private readonly baseballService: BaseballService) {}
 
-  @ApiOperation({ summary: '전체 팀 순위' })
-  @ApiResponse({ status: 200, type: [GetTeamRankingResponseDto] })
   @Get('rankings')
-  async getTeamRankings() {
+  @ApiOperation({ summary: '전체 팀 순위 조회' })
+  @ApiResponse({ status: 200, description: '성공', type: [TeamRankingDto] })
+  async getRankings(): Promise<TeamRankingDto[]> {
     return this.baseballService.getTeamRankings();
   }
 
-  @ApiOperation({ summary: '플레이어 순위 (타자/투수)' })
-  @ApiResponse({ status: 200, type: [GetTopPlayerResponseDto] })
   @Get('topplayer')
-  async getTopPlayers() {
+  @ApiOperation({ summary: '플레이어 1위 랭킹' })
+  @ApiResponse({ status: 200, type: GetTopPlayersResponseDto })
+  async getTopPlayers(): Promise<GetTopPlayersResponseDto> {
     return this.baseballService.getTopPlayers();
-  }
-
-  @ApiOperation({ summary: '오늘의 경기 일정' })
-  @ApiResponse({ status: 200, type: [GetTodayGameResponseDto] })
-  @Get('games/today')
-  async getTodayGames() {
-    return this.baseballService.getTodayGames();
   }
 }
