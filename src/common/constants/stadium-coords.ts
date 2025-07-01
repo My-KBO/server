@@ -7,5 +7,5 @@ export const STADIUM_COORDS: Record<string, { lat: number; lon: number }> = {
   창원: { lat: 35.22264, lon: 128.582315 },
   광주: { lat: 35.168229, lon: 126.889149 },
   수원: { lat: 37.299849, lon: 127.009679 },
-  대전: { lat: 36.317195, lon: 127.429071 },
+  '대전(신)': { lat: 36.317195, lon: 127.429071 },
 };
