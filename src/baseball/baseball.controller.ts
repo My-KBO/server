@@ -3,6 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { BaseballService } from './baseball.service';
 import { TeamRankingDto } from './dto/team-ranking.dto';
 import { GetTopPlayersResponseDto } from './dto/top-player.dto';
+import { TodayGameDto } from './dto/today-games.dto';
 
 @ApiTags('baseball')
 @Controller('api/v1/baseball')
@@ -21,5 +22,12 @@ export class BaseballController {
   @ApiResponse({ status: 200, type: GetTopPlayersResponseDto })
   async getTopPlayers(): Promise<GetTopPlayersResponseDto> {
     return this.baseballService.getTopPlayers();
+  }
+
+  @Get('games/today')
+  @ApiOperation({ summary: '오늘의 경기 일정 조회' })
+  @ApiResponse({ status: 200, description: '성공', type: [TodayGameDto] })
+  async getTodayGames(): Promise<TodayGameDto[]> {
+    return this.baseballService.getTodayGames();
   }
 }

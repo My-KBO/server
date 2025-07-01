@@ -2,6 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GetTopPlayersResponseDto, TopPlayerDto } from './dto/top-player.dto';
 import { TeamRankingDto } from './dto/team-ranking.dto';
+import { TodayGameDto } from './dto/today-games.dto';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 
 @Injectable()
 export class BaseballService {
@@ -46,6 +49,27 @@ export class BaseballService {
       winRate: r.winRate,
       gameGap: r.gameGap,
       streak: r.streak,
+    }));
+  }
+  async getTodayGames(): Promise<TodayGameDto[]> {
+    const now = new Date();
+    const todayFormatted = format(now, 'MM.dd(eee)', { locale: ko });
+
+    const games = await this.prisma.schedule.findMany({
+      where: { date: todayFormatted },
+      orderBy: { time: 'asc' },
+    });
+
+    return games.map((g) => ({
+      date: g.date,
+      time: g.time,
+      homeTeam: g.homeTeam,
+      homeScore: g.homeScore,
+      awayTeam: g.awayTeam,
+      awayScore: g.awayScore,
+      stadium: g.stadium,
+      tv: g.tv,
+      note: g.note,
     }));
   }
 }
