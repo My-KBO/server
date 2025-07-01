@@ -127,3 +127,13 @@ model PlayerStat {
   @@unique([category, name, team])
 }
 
+model TeamTopPlayer {
+  id     Int     @id @default(autoincrement())
+  team   String
+  name   String
+  type   String   
+  game   Float     
+  value  Float     
+
+  @@unique([team, name, type])
+}
