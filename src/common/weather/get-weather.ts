@@ -6,7 +6,6 @@ const API_KEY = process.env.OPEN_WEATHER_API_KEY;
 export interface WeatherResult {
   temperature: number;
   description: string;
-  icon: string;
 }
 
 export async function fetchWeatherByStadium(stadium: string): Promise<WeatherResult | null> {
@@ -20,7 +19,6 @@ export async function fetchWeatherByStadium(stadium: string): Promise<WeatherRes
     return {
       temperature: data.main.temp,
       description: data.weather[0].description,
-      icon: data.weather[0].icon,
     };
   } catch (e) {
     console.error(`[날씨 API 호출 실패]:`, e.message);

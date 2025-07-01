@@ -5,6 +5,7 @@ import { TeamRankingDto } from './dto/team-ranking.dto';
 import { TodayGameDto } from './dto/today-games.dto';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+import { fetchWeatherByStadium } from 'src/common/weather/get-weather';
 
 @Injectable()
 export class BaseballService {
@@ -60,16 +61,14 @@ export class BaseballService {
       orderBy: { time: 'asc' },
     });
 
-    return games.map((g) => ({
-      date: g.date,
-      time: g.time,
-      homeTeam: g.homeTeam,
-      homeScore: g.homeScore,
-      awayTeam: g.awayTeam,
-      awayScore: g.awayScore,
-      stadium: g.stadium,
-      tv: g.tv,
-      note: g.note,
-    }));
+    return await Promise.all(
+      games.map(async (game) => {
+        const weather = await fetchWeatherByStadium(game.stadium);
+        return {
+          ...game,
+          weather,
+        };
+      }),
+    );
   }
 }
