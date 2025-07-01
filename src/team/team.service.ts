@@ -37,4 +37,27 @@ export class TeamService {
 
     return gamesWithWeather;
   }
+  async getRecentResults(teamName: string) {
+    const now = new Date();
+    const todayFormatted = format(now, 'MM.dd(eee)', { locale: ko });
+
+    const recentGames = await this.prisma.schedule.findMany({
+      where: {
+        AND: [
+          {
+            OR: [{ homeTeam: teamName }, { awayTeam: teamName }],
+          },
+          {
+            date: {
+              lt: todayFormatted,
+            },
+          },
+        ],
+      },
+      orderBy: { date: 'desc' },
+      take: 6,
+    });
+
+    return recentGames;
+  }
 }

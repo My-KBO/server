@@ -13,4 +13,10 @@ export class TeamController {
   getUpcomingSchedule(@Param('teamName') teamName: string) {
     return this.teamService.getUpcomingSchedule(teamName);
   }
+  @Get(':teamName/results')
+  @ApiOperation({ summary: '팀별 최근 6경기 결과 조회' })
+  @ApiParam({ name: 'teamName', example: 'LG' })
+  getRecentResults(@Param('teamName') teamName: string) {
+    return this.teamService.getRecentResults(teamName);
+  }
 }
