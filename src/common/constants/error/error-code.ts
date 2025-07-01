@@ -6,6 +6,7 @@ export const ErrorCode = {
     USER_NOT_FOUND: 'USER_001',
     INVALID_PASSWORD: 'USER_002',
     EMAIL_ALREADY_EXISTS: 'USER_003',
+    INVALID_REFRESH_TOKEN: 'USER_004',
   },
 
   Post: {

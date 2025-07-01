@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
@@ -34,7 +34,7 @@ export class AuthService {
     };
   }
 
-  async login(dto: LoginDto): Promise<{ accessToken: string }> {
+  async login(dto: LoginDto): Promise<{ accessToken: string; refreshToken: string }> {
     const user = await this.prisma.user.findUnique({
       where: { email: dto.email },
     });
@@ -52,8 +52,52 @@ export class AuthService {
     }
 
     const payload = { sub: user.id };
-    const accessToken = this.jwtService.sign(payload);
-    return { accessToken };
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.saveRefreshToken(user.id, refreshToken);
+
+    return { accessToken, refreshToken };
+  }
+
+  async refresh(
+    userId: string,
+    oldRefreshToken: string,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user || user.refreshToken !== oldRefreshToken) {
+      throw new BusinessException(
+        ErrorCode.User.INVALID_REFRESH_TOKEN,
+        ErrorMessage.User.INVALID_REFRESH_TOKEN,
+      );
+    }
+
+    const payload = { sub: userId };
+
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    await this.saveRefreshToken(userId, refreshToken);
+
+    return { accessToken, refreshToken };
+  }
+
+  async logout(userId: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken: null },
+    });
+  }
+
+  private async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { refreshToken },
+    });
   }
 
   private async hashPassword(password: string): Promise<string> {

@@ -8,7 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule,
+    ConfigModule.forRoot({ isGlobal: true }),
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET,

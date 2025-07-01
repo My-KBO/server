@@ -14,6 +14,7 @@ model User {
   nickname       String
   favoriteTeam   String?  @map("favorite_team")
   createdAt      DateTime @default(now()) @map("created_at")
+  refreshToken String?  @map("refresh_token")
 
   posts          Post[]
   comments       Comment[]
@@ -88,49 +89,51 @@ model CommentLike {
   @@unique([userId, commentId], name: "userId_commentId")
 }
 
-model Team {
-  id           Int       @id @default(autoincrement())
-  name         String
-  location     String
-  stadium      String
-  logoUrl      String    @map("logo_url")
+model Schedule {
+  id         Int     @id @default(autoincrement())
+  date       String
+  time       String
+  homeTeam   String
+  homeScore  String
+  awayTeam   String
+  awayScore  String
+  tv         String
+  stadium    String
+  note       String
 
-  players      Player[]
-  homeGames    Game[]    @relation("HomeGames")
-  awayGames    Game[]    @relation("AwayGames")
-  news         News[]
+  @@unique([date, time, stadium])
 }
 
-model Player {
-  id          Int      @id @default(autoincrement())
-  teamId      Int      @map("team_id")
-  name        String
-  position    String
-  statsJson   Json     @map("stats_json")
-
-  team        Team     @relation(fields: [teamId], references: [id])
+model TeamRank {
+  id        Int     @id @default(autoincrement())
+  rank      Int
+  team      String  @unique
+  games     Int
+  win       Int
+  lose      Int
+  draw      Int
+  winRate   Float
+  gameGap   String
+  streak    String
 }
 
-model Game {
-  id           Int      @id @default(autoincrement())
-  homeTeamId   Int      @map("home_team_id")
-  awayTeamId   Int      @map("away_team_id")
-  gameDate     DateTime @map("game_date")
-  stadium      String
-  resultJson   Json     @map("result_json")
+model PlayerStat {
+  id       Int     @id @default(autoincrement())
+  category String
+  name     String
+  team     String
+  value    String
 
-  homeTeam     Team     @relation("HomeGames", fields: [homeTeamId], references: [id])
-  awayTeam     Team     @relation("AwayGames", fields: [awayTeamId], references: [id])
+  @@unique([category, name, team])
 }
 
-model News {
-  id             Int      @id @default(autoincrement())
-  title          String
-  contentUrl     String   @map("content_url")
-  thumbnailUrl   String   @map("thumbnail_url")
-  source         String
-  publishedAt    DateTime @map("published_at")
-  relatedTeamId  Int      @map("related_team_id")
+model TeamTopPlayer {
+  id     Int     @id @default(autoincrement())
+  team   String
+  name   String
+  type   String   
+  game   Float     
+  value  Float     
 
-  team           Team     @relation(fields: [relatedTeamId], references: [id])
+  @@unique([team, name, type])
 }

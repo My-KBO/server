@@ -3,7 +3,7 @@ name: Deploy to EC2 (Dev)
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   deploy:
@@ -30,6 +30,14 @@ jobs:
       - name: Copy files to EC2
         run: |
           rsync -avz -e "ssh -i ~/.ssh/id_rsa" ./ ubuntu@${{ secrets.EC2_HOST }}:/home/ubuntu/server
+      - name: Free up Docker space
+        run: |
+          ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            docker container prune -f
+            docker image prune -a -f
+            docker volume prune -f
+            docker builder prune -a -f
+          EOF
 
       - name: Run Docker Compose on EC2
         run: |
