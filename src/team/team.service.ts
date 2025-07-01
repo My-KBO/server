@@ -3,10 +3,25 @@ import { PrismaService } from '../prisma/prisma.service';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { fetchWeatherByStadium } from '../common/weather/get-weather';
+import { PostCategory } from 'src/common/constants/post-category.enum';
+import { TeamHotPostDto } from './dto/team-hot-post.dto';
 
 @Injectable()
 export class TeamService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private readonly teamCategoryMap: Record<string, PostCategory> = {
+    LG: PostCategory.LG,
+    두산: PostCategory.DOOSAN,
+    삼성: PostCategory.SAMSUNG,
+    SSG: PostCategory.SSG,
+    롯데: PostCategory.LOTTE,
+    키움: PostCategory.KIWOOM,
+    한화: PostCategory.HANHWA,
+    KIA: PostCategory.KIA,
+    NC: PostCategory.NC,
+    KT: PostCategory.KT,
+  };
 
   async getUpcomingSchedule(teamName: string) {
     const now = new Date();
@@ -88,5 +103,26 @@ export class TeamService {
           }
         : null,
     };
+  }
+  async getHotPosts(teamName: string): Promise<TeamHotPostDto[]> {
+    const category = this.teamCategoryMap[teamName];
+
+    const posts = await this.prisma.post.findMany({
+      where: { category },
+      orderBy: { likesCount: 'desc' },
+      take: 2,
+      include: {
+        user: {
+          select: {
+            nickname: true,
+          },
+        },
+      },
+    });
+
+    return posts.map((post) => ({
+      nickname: post.user.nickname,
+      title: post.title,
+    }));
   }
 }

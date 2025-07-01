@@ -1,6 +1,7 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { TeamService } from './team.service';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiParam, ApiOkResponse } from '@nestjs/swagger';
+import { TeamHotPostDto } from './dto/team-hot-post.dto';
 
 @ApiTags('Team Dashboard')
 @Controller('api/v1/teams')
@@ -24,5 +25,11 @@ export class TeamController {
   @ApiParam({ name: 'teamName', example: 'LG' })
   getTopPlayers(@Param('teamName') teamName: string) {
     return this.teamService.getTopPlayers(teamName);
+  }
+  @Get(':teamName/hotposts')
+  @ApiOperation({ summary: '팀 응원글 상위 2개 조회' })
+  @ApiOkResponse({ type: [TeamHotPostDto] })
+  async getTeamHotPosts(@Param('teamName') teamName: string): Promise<TeamHotPostDto[]> {
+    return this.teamService.getHotPosts(teamName);
   }
 }
