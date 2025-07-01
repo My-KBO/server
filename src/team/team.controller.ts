@@ -19,4 +19,10 @@ export class TeamController {
   getRecentResults(@Param('teamName') teamName: string) {
     return this.teamService.getRecentResults(teamName);
   }
+  @Get(':teamName/topplayers')
+  @ApiOperation({ summary: '팀별 인기 선수 조회 (타자/투수)' })
+  @ApiParam({ name: 'teamName', example: 'LG' })
+  getTopPlayers(@Param('teamName') teamName: string) {
+    return this.teamService.getTopPlayers(teamName);
+  }
 }

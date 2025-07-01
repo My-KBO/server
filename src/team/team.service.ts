@@ -60,4 +60,33 @@ export class TeamService {
 
     return recentGames;
   }
+  async getTopPlayers(teamName: string) {
+    const hitters = await this.prisma.teamTopPlayer.findFirst({
+      where: { team: teamName, type: '타자' },
+      orderBy: { id: 'desc' },
+    });
+
+    const pitchers = await this.prisma.teamTopPlayer.findFirst({
+      where: { team: teamName, type: '투수' },
+      orderBy: { id: 'desc' },
+    });
+
+    return {
+      타자: hitters
+        ? {
+            name: hitters.name,
+            game: hitters.game,
+            value: hitters.value,
+          }
+        : null,
+
+      투수: pitchers
+        ? {
+            name: pitchers.name,
+            game: pitchers.game,
+            value: pitchers.value,
+          }
+        : null,
+    };
+  }
 }
