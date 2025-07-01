@@ -10,6 +10,7 @@ import { ScheduleModule } from './schedule/schedule.module';
 import { ConfigModule } from './config/config.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommentModule } from './comment/comment.module';
+import { TeamModule } from './team/team.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { CommentModule } from './comment/comment.module';
     ConfigModule,
     PrismaModule,
     CommentModule,
+    TeamModule,
   ],
   controllers: [AppController],
   providers: [AppService],
