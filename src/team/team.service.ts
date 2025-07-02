@@ -30,9 +30,7 @@ export class TeamService {
     const upcomingGames = await this.prisma.schedule.findMany({
       where: {
         OR: [{ homeTeam: teamName }, { awayTeam: teamName }],
-        date: {
-          gte: todayFormatted,
-        },
+        date: todayFormatted,
       },
       orderBy: { date: 'asc' },
       take: 4,
@@ -87,7 +85,7 @@ export class TeamService {
     });
 
     return {
-      hitters: hitters
+      hitter: hitters
         ? {
             name: hitters.name,
             game: hitters.game,
@@ -95,7 +93,7 @@ export class TeamService {
           }
         : null,
 
-      pitchers: pitchers
+      pitcher: pitchers
         ? {
             name: pitchers.name,
             game: pitchers.game,
