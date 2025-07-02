@@ -25,7 +25,7 @@ export class TeamService {
 
   async getUpcomingSchedule(teamName: string) {
     const now = new Date();
-    const todayFormatted = format(now, 'MM.dd(eee)', { locale: ko });
+    const todayFormatted = format(now, 'yyyy-MM-dd', { locale: ko });
 
     const upcomingGames = await this.prisma.schedule.findMany({
       where: {
@@ -52,7 +52,7 @@ export class TeamService {
   }
   async getRecentResults(teamName: string) {
     const now = new Date();
-    const todayFormatted = format(now, 'MM.dd(eee)', { locale: ko });
+    const todayFormatted = format(now, 'yyyy-MM-dd', { locale: ko });
 
     const recentGames = await this.prisma.schedule.findMany({
       where: {

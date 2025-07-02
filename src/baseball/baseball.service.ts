@@ -54,7 +54,7 @@ export class BaseballService {
   }
   async getTodayGames(): Promise<TodayGameDto[]> {
     const now = new Date();
-    const todayFormatted = format(now, 'MM.dd(eee)', { locale: ko });
+    const todayFormatted = format(now, 'yyyy-MM-dd', { locale: ko });
 
     const games = await this.prisma.schedule.findMany({
       where: { date: todayFormatted },
