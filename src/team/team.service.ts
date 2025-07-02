@@ -62,6 +62,7 @@ export class TeamService {
         },
       },
       orderBy: { date: 'desc' },
+      take: 6,
     });
 
     return recentGames;
