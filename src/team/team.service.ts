@@ -30,7 +30,7 @@ export class TeamService {
     const upcomingGames = await this.prisma.schedule.findMany({
       where: {
         OR: [{ homeTeam: teamName }, { awayTeam: teamName }],
-        date: todayFormatted,
+        date: { gte: todayFormatted },
       },
       orderBy: { date: 'asc' },
       take: 4,
@@ -56,19 +56,12 @@ export class TeamService {
 
     const recentGames = await this.prisma.schedule.findMany({
       where: {
-        AND: [
-          {
-            OR: [{ homeTeam: teamName }, { awayTeam: teamName }],
-          },
-          {
-            date: {
-              lt: todayFormatted,
-            },
-          },
-        ],
+        OR: [{ homeTeam: teamName }, { awayTeam: teamName }],
+        date: {
+          lt: todayFormatted,
+        },
       },
       orderBy: { date: 'desc' },
-      take: 6,
     });
 
     return recentGames;
