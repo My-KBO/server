@@ -87,7 +87,7 @@ export class TeamService {
     });
 
     return {
-      타자: hitters
+      hitters: hitters
         ? {
             name: hitters.name,
             game: hitters.game,
@@ -95,7 +95,7 @@ export class TeamService {
           }
         : null,
 
-      투수: pitchers
+      pitchers: pitchers
         ? {
             name: pitchers.name,
             game: pitchers.game,
