@@ -7,7 +7,6 @@ export class SignupDto {
   @IsEmail()
   email: string;
 
-  @IsString()
   @MinLength(6) // Todo : 최소 길이 정해야함함
   @ApiProperty({ example: 'securePassword123' })
   @IsString()
@@ -16,7 +15,6 @@ export class SignupDto {
 
   @IsString()
   @ApiProperty({ example: '닉네임' })
-  @IsString()
   nickname: string;
 
   @IsOptional()
