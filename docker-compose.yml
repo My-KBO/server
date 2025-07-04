@@ -8,18 +8,6 @@ services:
       - '3456:3456'
     env_file:
       - .env
-    depends_on:
-      - db
     volumes:
       - /app/node_modules
     restart: unless-stopped
-
-  db:
-    image: postgres:15
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root!
-      POSTGRES_DB: mykbo
-    ports:
-      - '5432:5432'
