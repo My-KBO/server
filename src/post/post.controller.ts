@@ -12,10 +12,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { User } from '../common/decorator/user.decorator';
+import { User } from '../auth/decorator/user.decorator';
 import {
   ApiBearerAuth,
   ApiTags,

@@ -4,7 +4,7 @@ import { AuthService } from './auth.service';
 import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { Response, Request } from 'express';
-import { User } from 'src/common/decorator/user.decorator';
+import { User } from 'src/auth/decorator/user.decorator';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
