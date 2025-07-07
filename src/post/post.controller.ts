@@ -55,19 +55,18 @@ export class PostController {
   @ApiQuery({ name: 'limit', type: Number, required: false })
   getPosts(
     @Query('category') category?: PostCategory,
-    @Query('search') search?: string,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 20,
   ) {
-    return this.postService.getPosts({ category, search, page, limit });
+    return this.postService.getPosts({ category, page, limit });
   }
 
   @Patch(':id')
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   updatePost(
-    @Param('id', ParseIntPipe) id: number,
     @User('id') userId: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdatePostDto,
   ) {
     return this.postService.updatePost(userId, id, dto);
@@ -76,14 +75,14 @@ export class PostController {
   @Delete(':id')
   @ApiOperation({ summary: '게시글 삭제' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
-  deletePost(@Param('id', ParseIntPipe) id: number, @User('id') userId: string) {
+  deletePost(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
     return this.postService.deletePost(userId, id);
   }
 
   @Post(':id/like')
   @ApiOperation({ summary: '게시글 좋아요' })
-  @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
-  likePost(@Param('id', ParseIntPipe) id: number, @User('id') userId: string) {
-    return this.postService.likePost(userId, id);
+  @ApiParam({ name: 'id', type: Number })
+  togglePostLike(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
+    return this.postService.togglePostLike(userId, id);
   }
 }

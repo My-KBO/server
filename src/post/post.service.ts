@@ -131,21 +131,45 @@ export class PostService {
     await this.prisma.post.delete({ where: { id: postId } });
   }
 
-  async likePost(userId: string, postId: number) {
+  async togglePostLike(userId: string, postId: number) {
     await this.getPostOrThrow(postId);
-    const existing = await this.prisma.postLike.findFirst({ where: { postId, userId } });
+
+    const existing = await this.prisma.postLike.findUnique({
+      where: {
+        userId_postId: {
+          userId,
+          postId,
+        },
+      },
+    });
 
     if (existing) {
-      throw new BusinessException(
-        ErrorCode.Post.POST_ALREADY_LIKED,
-        ErrorMessage.Post.POST_ALREADY_LIKED,
-      );
-    }
+      await this.prisma.postLike.delete({
+        where: {
+          userId_postId: {
+            userId,
+            postId,
+          },
+        },
+      });
 
-    await this.prisma.postLike.create({ data: { postId, userId } });
-    await this.prisma.post.update({
-      where: { id: postId },
-      data: { likesCount: { increment: 1 } },
-    });
+      await this.prisma.post.update({
+        where: { id: postId },
+        data: { likesCount: { decrement: 1 } },
+      });
+
+      return { liked: false };
+    } else {
+      await this.prisma.postLike.create({
+        data: { userId, postId },
+      });
+
+      await this.prisma.post.update({
+        where: { id: postId },
+        data: { likesCount: { increment: 1 } },
+      });
+
+      return { liked: true };
+    }
   }
 }
