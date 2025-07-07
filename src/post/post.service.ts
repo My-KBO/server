@@ -32,12 +32,10 @@ export class PostService {
 
   async getPosts({
     category,
-    search,
     page,
     limit,
   }: {
     category?: PostCategory;
-    search?: string;
     page: number;
     limit: number;
   }) {
@@ -45,18 +43,6 @@ export class PostService {
 
     if (category) {
       where.category = category;
-    }
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search } },
-        { content: { contains: search } },
-        {
-          user: {
-            nickname: { contains: search },
-          },
-        },
-      ];
     }
 
     const [posts, total] = await this.prisma.$transaction([
