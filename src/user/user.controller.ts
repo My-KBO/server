@@ -1,7 +1,7 @@
 import { Controller, Get, Patch, Delete, Body, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { User } from './decorator/user.decorator';
+import { User } from '../common/decorator/user.decorator';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 

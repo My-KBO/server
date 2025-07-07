@@ -15,7 +15,7 @@ import { PostService } from './post.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { User } from '../user/decorator/user.decorator';
+import { User } from '../common/decorator/user.decorator';
 import {
   ApiBearerAuth,
   ApiTags,

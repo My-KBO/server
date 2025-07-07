@@ -13,7 +13,7 @@ import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { User } from '../user/decorator/user.decorator';
+import { User } from '../common/decorator/user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Comment')
