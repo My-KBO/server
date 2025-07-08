@@ -134,22 +134,17 @@ export class PostService {
   async togglePostLike(userId: string, postId: number) {
     await this.getPostOrThrow(postId);
 
-    const existing = await this.prisma.postLike.findUnique({
+    const existing = await this.prisma.postLike.findFirst({
       where: {
-        userId_postId: {
-          userId,
-          postId,
-        },
+        userId,
+        postId,
       },
     });
 
     if (existing) {
       await this.prisma.postLike.delete({
         where: {
-          userId_postId: {
-            userId,
-            postId,
-          },
+          id: existing.id,
         },
       });
 
