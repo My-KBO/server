@@ -86,11 +86,20 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  async logout(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: null },
-    });
+  async logout(refreshToken: string): Promise<void> {
+    if (!refreshToken) {
+      return;
+    }
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      await this.prisma.user.updateMany({
+        where: {
+          id: payload.sub,
+          refreshToken: refreshToken,
+        },
+        data: { refreshToken: null },
+      });
+    } catch (e) {}
   }
 
   private async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
