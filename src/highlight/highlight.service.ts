@@ -23,7 +23,7 @@ export class HighlightService {
 
     return res.data.items.map((item: any) => ({
       title: item.snippet.title,
-      publishedAt: item.snippet.publishedAt,
+      publishedAt: new Date(item.snippet.publishedAt).toISOString().slice(0, 10),
       videoUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       thumbnail: item.snippet.thumbnails.high.url,
     }));
