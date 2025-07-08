@@ -8,7 +8,7 @@ export class NewsService {
 
   async getLatestNews(): Promise<NewsResponseDto[]> {
     const news = await this.prisma.news.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
       take: 5,
     });
 
@@ -20,7 +20,7 @@ export class NewsService {
       where: {
         OR: [{ title: { contains: teamName } }, { summary: { contains: teamName } }],
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'asc' },
       take: 5,
     });
 
