@@ -11,7 +11,7 @@ async function bootstrap() {
     .setTitle('MyKBO API')
     .setDescription('KBO 응원팀 대시보드 및 커뮤니티 API 문서')
     .setVersion('1.0')
-    .addBearerAuth() // TODO : Authorization: Bearer 토큰 입력 가능?
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
