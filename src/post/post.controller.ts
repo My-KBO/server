@@ -8,7 +8,6 @@ import {
   Body,
   UseGuards,
   ParseIntPipe,
-  Put,
   Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
@@ -28,12 +27,12 @@ import { PostCategory } from 'src/common/constants/post-category.enum';
 
 @ApiTags('Post')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('api/v1/posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 생성' })
   createPost(@User('id') userId: string, @Body() dto: CreatePostDto) {
     return this.postService.createPost(userId, dto);
@@ -62,6 +61,7 @@ export class PostController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   updatePost(
@@ -73,6 +73,7 @@ export class PostController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 삭제' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   deletePost(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
@@ -80,6 +81,7 @@ export class PostController {
   }
 
   @Post(':id/like')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 좋아요' })
   @ApiParam({ name: 'id', type: Number })
   togglePostLike(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
