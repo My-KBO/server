@@ -10,6 +10,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { CommentModule } from './comment/comment.module';
 import { TeamModule } from './team/team.module';
 import { NewsModule } from './news/news.module';
+import { HighlightModule } from './highlight/highlight.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { NewsModule } from './news/news.module';
     CommentModule,
     TeamModule,
     NewsModule,
+    HighlightModule,
   ],
   controllers: [AppController],
   providers: [AppService],
