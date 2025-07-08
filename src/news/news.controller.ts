@@ -1,18 +1,25 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { NewsService } from './news.service';
-import { ApiTags, ApiOperation, ApiQuery, ApiOkResponse } from '@nestjs/swagger';
-import { NewsDto } from './dto/news.dto';
+import { NewsResponseDto } from './dto/news-response.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 
 @ApiTags('News')
-@Controller('api/v1/news')
+@Controller('api/v1')
 export class NewsController {
   constructor(private readonly newsService: NewsService) {}
 
-  @Get()
-  @ApiOperation({ summary: '최신 뉴스 검색 (query 필수)' })
-  @ApiQuery({ name: 'query', required: true, example: 'LG 트윈스' })
-  @ApiOkResponse({ type: [NewsDto] })
-  async getNews(@Query('query') query: string): Promise<NewsDto[]> {
-    return this.newsService.getLatestNews(query);
+  @Get('baseball/news')
+  @ApiOperation({ summary: '메인화면 최신 뉴스 5개' })
+  @ApiResponse({ status: 200, type: [NewsResponseDto] })
+  async getMainNews(): Promise<NewsResponseDto[]> {
+    return this.newsService.getLatestNews();
+  }
+
+  @Get('teams/:teamName/news')
+  @ApiOperation({ summary: '팀 뉴스 5개' })
+  @ApiParam({ name: 'teamName', example: '삼성', description: '팀 이름 (예: 삼성, LG)' })
+  @ApiResponse({ status: 200, type: [NewsResponseDto] })
+  async getTeamNews(@Param('teamName') teamName: string): Promise<NewsResponseDto[]> {
+    return this.newsService.getTeamNews(teamName);
   }
 }
