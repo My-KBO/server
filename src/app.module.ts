@@ -11,9 +11,15 @@ import { CommentModule } from './comment/comment.module';
 import { TeamModule } from './team/team.module';
 import { NewsModule } from './news/news.module';
 import { HighlightModule } from './highlight/highlight.module';
+import { ConfigModule } from '@nestjs/config';
+import jwtConfig from './config/jwt.config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [jwtConfig],
+    }),
     UserModule,
     PostModule,
     AuthModule,

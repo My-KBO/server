@@ -1,5 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
@@ -13,6 +14,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async signup(dto: SignupDto): Promise<{ id: string; email: string; nickname: string }> {
@@ -53,8 +55,12 @@ export class AuthService {
 
     const payload = { sub: user.id };
 
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '5h' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.accessTokenExpiresIn'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.refreshTokenExpiresIn'),
+    });
 
     await this.saveRefreshToken(user.id, refreshToken);
 
@@ -78,8 +84,12 @@ export class AuthService {
 
     const payload = { sub: userId };
 
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '1h' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.accessTokenExpiresIn'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.refreshTokenExpiresIn'),
+    });
 
     await this.saveRefreshToken(userId, refreshToken);
 
