@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { formatDate } from 'src/common/helpers/date-format.helper';
 
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
 const YOUTUBE_CHANNEL_ID = 'UCoVz66yWHzVsXAFG8WhJK9g';
@@ -36,7 +37,7 @@ export class HighlightService {
 
     return res.data.items.map((item: any) => ({
       title: item.snippet.title,
-      publishedAt: new Date(item.snippet.publishedAt).toISOString().slice(0, 10),
+      publishedAt: formatDate(new Date(item.snippet.publishedAt)),
       videoUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       thumbnail: item.snippet.thumbnails.high.url,
     }));
@@ -57,7 +58,7 @@ export class HighlightService {
 
     return res.data.items.map((item: any) => ({
       title: item.snippet.title,
-      publishedAt: new Date(item.snippet.publishedAt).toISOString().slice(0, 10),
+      publishedAt: formatDate(new Date(item.snippet.publishedAt)),
       videoUrl: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       thumbnail: item.snippet.thumbnails.high.url,
     }));

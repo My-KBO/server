@@ -10,6 +10,7 @@ import { Post } from '@prisma/client';
 import { PostDto } from './dto/post.dto';
 import { PostDetailDto } from './dto/post-detail.dto';
 import { PostListResponseDto } from './dto/post-list-response.dto';
+import { formatDate } from 'src/common/helpers/date-format.helper';
 
 @Injectable()
 export class PostService {
@@ -72,8 +73,8 @@ export class PostService {
         category: post.category,
         likes_count: post._count.likes,
         comments_count: post._count.comments,
-        created_at: post.createdAt.toISOString().substring(0, 10),
-        updated_at: post.updatedAt.toISOString().substring(0, 10),
+        created_at: formatDate(post.createdAt),
+        updated_at: formatDate(post.updatedAt),
         user: {
           nickname: post.user.nickname,
         },
@@ -124,8 +125,8 @@ export class PostService {
       likes_count: post._count.likes,
       comments_count: post._count.comments,
 
-      created_at: post.createdAt.toISOString().substring(0, 10),
-      updated_at: post.updatedAt.toISOString().substring(0, 10),
+      created_at: formatDate(post.createdAt),
+      updated_at: formatDate(post.updatedAt),
 
       user: {
         nickname: post.user.nickname,
@@ -231,8 +232,8 @@ export class PostService {
       views: post.views,
       category: post.category,
       likes_count: post.likesCount,
-      created_at: post.createdAt.toISOString().substring(0, 10),
-      updated_at: post.updatedAt.toISOString().substring(0, 10),
+      created_at: formatDate(post.createdAt),
+      updated_at: formatDate(post.updatedAt),
       user: {
         nickname: post.user.nickname,
       },
