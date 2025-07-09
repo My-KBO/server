@@ -5,7 +5,6 @@ import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { AuthModule } from './auth/auth.module';
 import { BaseballModule } from './baseball/baseball.module';
-import { ScheduleModule } from './schedule/schedule.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommentModule } from './comment/comment.module';
 import { TeamModule } from './team/team.module';
@@ -24,7 +23,6 @@ import jwtConfig from './config/jwt.config';
     PostModule,
     AuthModule,
     BaseballModule,
-    ScheduleModule,
     PrismaModule,
     CommentModule,
     TeamModule,
