@@ -24,7 +24,6 @@ export class NewsService {
   async getTeamNews(teamName: string): Promise<NewsResponseDto[]> {
     const allNews = await this.prisma.news.findMany({
       orderBy: { createdAt: 'asc' },
-      take: 80,
     });
 
     const filtered = allNews.filter((item) => {

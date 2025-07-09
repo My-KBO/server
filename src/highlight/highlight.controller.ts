@@ -19,6 +19,6 @@ export class HighlightController {
   @ApiParam({ name: 'teamName', example: '삼성' })
   @ApiResponse({ status: 200, description: '성공' })
   async getTeamHighlights(@Param('teamName') teamName: string) {
-    return this.highLightService.searchHighlights(teamName);
+    return this.highLightService.getTeamHighlights(teamName);
   }
 }
