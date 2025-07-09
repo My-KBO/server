@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { UpdateNicknameDto } from './dto/update-nickname.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { ErrorCode } from '../common/constants/error/error-code';
 import { ErrorMessage } from '../common/constants/error/error-message';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateTeamDto } from './dto/update-teat.dto';
 
 @Injectable()
 export class UserService {
@@ -35,16 +38,51 @@ export class UserService {
     return user;
   }
 
-  async updateProfile(userId: string, dto: UpdateProfileDto) {
-    await this.getUserOrThrow(userId);
+  async updatePassword(userId: string, dto: UpdatePasswordDto) {
+    const user = await this.getUserOrThrow(userId);
 
-    return this.prisma.user.update({
+    const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!isMatch) {
+      throw new BusinessException(
+        ErrorCode.User.USER_PASSWORD_INCORRECT,
+        ErrorMessage.User.USER_PASSWORD_INCORRECT,
+      );
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.newPassword, 10);
+
+    await this.prisma.user.update({
       where: { id: userId },
       data: {
-        nickname: dto.nickname,
-        favoriteTeam: dto.favoriteTeam,
+        password: hashedPassword,
       },
     });
+
+    return { message: '비밀번호가 성공적으로 변경되었습니다.' };
+  }
+
+  async updateNickname(userId: string, dto: UpdateNicknameDto) {
+    await this.getUserOrThrow(userId);
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        nickname: dto.newNickname,
+      },
+    });
+
+    return { message: '닉네임이 성공적으로 변경되었습니다.' };
+  }
+  async updateFavoriteTeam(userId: string, dto: UpdateTeamDto) {
+    await this.getUserOrThrow(userId);
+
+    this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        favoriteTeam: dto.newFavoriteTeam,
+      },
+    });
+    return { message: '좋아하는 팀이 성공적으로 변경되었습니다.' };
   }
 
   async deleteAccount(userId: string) {
@@ -53,6 +91,8 @@ export class UserService {
     await this.prisma.user.delete({
       where: { id: userId },
     });
+
+    return { message: '회원 탈퇴가 완료되었습니다.' };
   }
 
   async getMyPosts(userId: string) {
