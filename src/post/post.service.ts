@@ -6,11 +6,10 @@ import { BusinessException } from '../common/exceptions/business.exception';
 import { ErrorCode } from '../common/constants/error/error-code';
 import { ErrorMessage } from '../common/constants/error/error-message';
 import { PostCategory } from 'src/common/constants/post-category.enum';
-import { Post } from '@prisma/client';
 import { PostDto } from './dto/post.dto';
 import { PostDetailDto } from './dto/post-detail.dto';
 import { PostListResponseDto } from './dto/post-list-response.dto';
-import { formatDate } from 'src/common/helpers/date-format.helper';
+import { formatDate } from '../common/helpers/date-format.helper';
 
 @Injectable()
 export class PostService {

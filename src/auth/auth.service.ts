@@ -17,10 +17,10 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async signup(dto: SignupDto): Promise<{ id: string; email: string; nickname: string }> {
+  async signup(dto: SignupDto) {
     const hashedPassword = await this.hashPassword(dto.password);
 
-    const user = await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         email: dto.email,
         password: hashedPassword,
@@ -30,9 +30,7 @@ export class AuthService {
     });
 
     return {
-      id: user.id,
-      email: user.email,
-      nickname: user.nickname,
+      message: '회원가입이 완료되었습니다.',
     };
   }
 
