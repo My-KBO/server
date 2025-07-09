@@ -87,9 +87,6 @@ export class AuthService {
   }
 
   async logout(refreshToken: string): Promise<void> {
-    if (!refreshToken) {
-      return;
-    }
     try {
       const payload = this.jwtService.verify(refreshToken);
       await this.prisma.user.updateMany({
@@ -99,7 +96,9 @@ export class AuthService {
         },
         data: { refreshToken: null },
       });
-    } catch (e) {}
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
   }
 
   private async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
