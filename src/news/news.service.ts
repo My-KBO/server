@@ -18,7 +18,14 @@ export class NewsService {
       take: 5,
     });
 
-    return news.map(this.toDto);
+    return news.map((item) => ({
+      id: item.id,
+      title: item.title,
+      summary: item.summary,
+      date: item.date,
+      url: item.url,
+      thumbnail: item.thumbnail,
+    }));
   }
 
   async getTeamNews(teamName: string): Promise<NewsResponseDto[]> {
@@ -31,17 +38,13 @@ export class NewsService {
       return title.includes(teamName) && countTeamMentions(title) === 1;
     });
 
-    return filtered.slice(0, 5).map(this.toDto);
-  }
-
-  private toDto(news: any): NewsResponseDto {
-    return {
-      id: news.id,
-      title: news.title,
-      summary: news.summary,
-      date: news.date,
-      url: news.url,
-      thumbnail: news.thumbnail,
-    };
+    return filtered.slice(0, 5).map((item) => ({
+      id: item.id,
+      title: item.title,
+      summary: item.summary,
+      date: item.date,
+      url: item.url,
+      thumbnail: item.thumbnail,
+    }));
   }
 }
