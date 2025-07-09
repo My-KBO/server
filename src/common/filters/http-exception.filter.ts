@@ -2,6 +2,8 @@ import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from
 import { Response } from 'express';
 import { BusinessException } from '../exceptions/business.exception';
 import { ErrorCode } from '../constants/error/error-code';
+import { Prisma } from '@prisma/client';
+import { ErrorMessage } from '../constants/error/error-message';
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -12,6 +14,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let code = ErrorCode.INTERNAL_SERVER_ERROR;
     let message = '서버 내부 오류';
+
+    // Prisma 예외 처리
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      if (exception.code === 'P2025') {
+        code = ErrorCode.User.USER_NOT_FOUND;
+        message = ErrorMessage.User.USER_NOT_FOUND;
+        status = HttpStatus.NOT_FOUND;
+      }
+    }
 
     // 비즈니스 예외 처리
     if (exception instanceof BusinessException) {
