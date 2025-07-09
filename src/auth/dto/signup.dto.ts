@@ -4,16 +4,15 @@ import { IsEmail, IsString, IsOptional, MinLength } from 'class-validator';
 export class SignupDto {
   @IsEmail()
   @ApiProperty({ example: 'user@example.com' })
-  @IsEmail()
   email: string;
 
   @MinLength(6)
   @ApiProperty({ example: 'securePassword123' })
   @IsString()
-  @MinLength(6)
   password: string;
 
   @IsString()
+  @MinLength(2)
   @ApiProperty({ example: '닉네임' })
   nickname: string;
 
