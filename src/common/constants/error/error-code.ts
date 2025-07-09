@@ -7,6 +7,7 @@ export const ErrorCode = {
     INVALID_PASSWORD: 'USER_002',
     EMAIL_ALREADY_EXISTS: 'USER_003',
     INVALID_REFRESH_TOKEN: 'USER_004',
+    USER_PASSWORD_INCORRECT: 'USER_005',
   },
 
   Post: {

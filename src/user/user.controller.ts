@@ -1,9 +1,11 @@
 import { Controller, Get, Patch, Delete, Body, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { User } from './decorator/user.decorator';
-import { UpdateProfileDto } from './dto/update-profile.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../auth/decorator/user.decorator';
+import { UpdateNicknameDto } from './dto/update-nickname.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { UpdatePasswordDto } from './dto/update-password.dto';
+import { UpdateTeamDto } from './dto/update-teat.dto';
 
 @ApiTags('User')
 @ApiBearerAuth()
@@ -19,11 +21,23 @@ export class UserController {
     return this.userService.getProfile(userId);
   }
 
-  @Patch('profile')
-  @ApiOperation({ summary: '내 정보 수정' })
+  @Patch('profile/password')
+  @ApiOperation({ summary: '내 정보 비밀번호 수정' })
   @ApiResponse({ status: 200, description: '유저 정보 수정 성공' })
-  updateProfile(@User('id') userId: string, @Body() dto: UpdateProfileDto) {
-    return this.userService.updateProfile(userId, dto);
+  updateProfile(@User('id') userId: string, @Body() dto: UpdatePasswordDto) {
+    return this.userService.updatePassword(userId, dto);
+  }
+  @Patch('profile/nickname')
+  @ApiOperation({ summary: '내 정보 닉네임 수정' })
+  @ApiResponse({ status: 200, description: '유저 정보 수정 성공' })
+  updateNickname(@User('id') userId: string, @Body() dto: UpdateNicknameDto) {
+    return this.userService.updateNickname(userId, dto);
+  }
+  @Patch('profile/team')
+  @ApiOperation({ summary: '내 정보 좋아하는 팀 수정' })
+  @ApiResponse({ status: 200, description: '유저 정보 수정 성공' })
+  updateFavoriteTeam(@User('id') userId: string, @Body() dto: UpdateTeamDto) {
+    return this.userService.updateFavoriteTeam(userId, dto);
   }
 
   @Delete('profile')

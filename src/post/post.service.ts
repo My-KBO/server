@@ -6,6 +6,10 @@ import { BusinessException } from '../common/exceptions/business.exception';
 import { ErrorCode } from '../common/constants/error/error-code';
 import { ErrorMessage } from '../common/constants/error/error-message';
 import { PostCategory } from 'src/common/constants/post-category.enum';
+import { PostDto } from './dto/post.dto';
+import { PostDetailDto } from './dto/post-detail.dto';
+import { PostListResponseDto } from './dto/post-list-response.dto';
+import { formatDate } from '../common/helpers/date-format.helper';
 
 @Injectable()
 export class PostService {
@@ -32,31 +36,17 @@ export class PostService {
 
   async getPosts({
     category,
-    search,
     page,
     limit,
   }: {
     category?: PostCategory;
-    search?: string;
     page: number;
     limit: number;
-  }) {
+  }): Promise<PostListResponseDto> {
     const where: any = {};
 
     if (category) {
       where.category = category;
-    }
-
-    if (search) {
-      where.OR = [
-        { title: { contains: search } },
-        { content: { contains: search } },
-        {
-          user: {
-            nickname: { contains: search },
-          },
-        },
-      ];
     }
 
     const [posts, total] = await this.prisma.$transaction([
@@ -66,7 +56,7 @@ export class PostService {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { id: true, nickname: true } },
+          user: { select: { nickname: true } },
           _count: { select: { comments: true, likes: true } },
         },
       }),
@@ -75,9 +65,18 @@ export class PostService {
 
     return {
       data: posts.map((post) => ({
-        ...post,
-        commentsCount: post._count.comments,
-        likesCount: post._count.likes,
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        views: post.views,
+        category: post.category,
+        likes_count: post._count.likes,
+        comments_count: post._count.comments,
+        created_at: formatDate(post.createdAt),
+        updated_at: formatDate(post.updatedAt),
+        user: {
+          nickname: post.user.nickname,
+        },
       })),
       meta: {
         total,
@@ -87,18 +86,22 @@ export class PostService {
     };
   }
 
-  async getPostDetail(postId: number) {
+  async getPostDetail(postId: number): Promise<PostDetailDto> {
     const post = await this.prisma.post.update({
       where: { id: postId },
       data: { views: { increment: 1 } },
       include: {
-        user: { select: { id: true, nickname: true } },
+        user: {
+          select: { nickname: true },
+        },
         comments: {
           select: {
             id: true,
             content: true,
             createdAt: true,
-            user: { select: { id: true, nickname: true } },
+            user: {
+              select: { nickname: true },
+            },
           },
           orderBy: { createdAt: 'asc' },
         },
@@ -113,9 +116,29 @@ export class PostService {
     }
 
     return {
-      ...post,
-      likesCount: post._count.likes,
-      commentsCount: post._count.comments,
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      views: post.views,
+      category: post.category,
+      likes_count: post._count.likes,
+      comments_count: post._count.comments,
+
+      created_at: formatDate(post.createdAt),
+      updated_at: formatDate(post.updatedAt),
+
+      user: {
+        nickname: post.user.nickname,
+      },
+
+      comments: post.comments.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.createdAt.toISOString().substring(0, 10),
+        user: {
+          nickname: comment.user.nickname,
+        },
+      })),
     };
   }
 
@@ -145,21 +168,74 @@ export class PostService {
     await this.prisma.post.delete({ where: { id: postId } });
   }
 
-  async likePost(userId: string, postId: number) {
+  async togglePostLike(userId: string, postId: number) {
     await this.getPostOrThrow(postId);
-    const existing = await this.prisma.postLike.findFirst({ where: { postId, userId } });
+
+    const existing = await this.prisma.postLike.findFirst({
+      where: {
+        userId,
+        postId,
+      },
+    });
 
     if (existing) {
-      throw new BusinessException(
-        ErrorCode.Post.POST_ALREADY_LIKED,
-        ErrorMessage.Post.POST_ALREADY_LIKED,
-      );
-    }
+      await this.prisma.postLike.delete({
+        where: {
+          id: existing.id,
+        },
+      });
 
-    await this.prisma.postLike.create({ data: { postId, userId } });
-    await this.prisma.post.update({
-      where: { id: postId },
-      data: { likesCount: { increment: 1 } },
+      await this.prisma.post.update({
+        where: { id: postId },
+        data: { likesCount: { decrement: 1 } },
+      });
+
+      return { liked: false };
+    } else {
+      await this.prisma.postLike.create({
+        data: { userId, postId },
+      });
+
+      await this.prisma.post.update({
+        where: { id: postId },
+        data: { likesCount: { increment: 1 } },
+      });
+
+      return { liked: true };
+    }
+  }
+  async getHotPosts(): Promise<PostDto[]> {
+    const posts = await this.prisma.post.findMany({
+      where: {
+        likesCount: {
+          gte: 10,
+        },
+      },
+      include: {
+        user: {
+          select: {
+            nickname: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      take: 10,
     });
+
+    return posts.map((post) => ({
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      views: post.views,
+      category: post.category,
+      likes_count: post.likesCount,
+      created_at: formatDate(post.createdAt),
+      updated_at: formatDate(post.updatedAt),
+      user: {
+        nickname: post.user.nickname,
+      },
+    }));
   }
 }

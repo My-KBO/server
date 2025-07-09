@@ -8,14 +8,14 @@ import {
   Body,
   UseGuards,
   ParseIntPipe,
-  Put,
   Query,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { User } from '../user/decorator/user.decorator';
+import { PostDto } from './dto/post.dto';
+import { User } from '../auth/decorator/user.decorator';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -25,25 +25,33 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { PostCategory } from 'src/common/constants/post-category.enum';
+import { PostDetailDto } from './dto/post-detail.dto';
+import { PostListResponseDto } from './dto/post-list-response.dto';
 
 @ApiTags('Post')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('api/v1/posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 생성' })
   createPost(@User('id') userId: string, @Body() dto: CreatePostDto) {
     return this.postService.createPost(userId, dto);
+  }
+
+  @Get('hotposts')
+  @ApiOperation({ summary: '추천수 10개 이상 게시글 조회' })
+  async getHotPosts(): Promise<PostDto[]> {
+    return this.postService.getHotPosts();
   }
 
   @Get(':id')
   @ApiOperation({ summary: '게시글 조회 ' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   @ApiOkResponse({ description: '게시글 상세 정보 반환' })
-  getPostDetail(@Param('id', ParseIntPipe) postId: number) {
+  getPostDetail(@Param('id', ParseIntPipe) postId: number): Promise<PostDetailDto> {
     return this.postService.getPostDetail(postId);
   }
 
@@ -55,35 +63,37 @@ export class PostController {
   @ApiQuery({ name: 'limit', type: Number, required: false })
   getPosts(
     @Query('category') category?: PostCategory,
-    @Query('search') search?: string,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 20,
-  ) {
-    return this.postService.getPosts({ category, search, page, limit });
+  ): Promise<PostListResponseDto> {
+    return this.postService.getPosts({ category, page, limit });
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 수정' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   updatePost(
-    @Param('id', ParseIntPipe) id: number,
     @User('id') userId: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdatePostDto,
   ) {
     return this.postService.updatePost(userId, id, dto);
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 삭제' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
-  deletePost(@Param('id', ParseIntPipe) id: number, @User('id') userId: string) {
+  deletePost(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
     return this.postService.deletePost(userId, id);
   }
 
   @Post(':id/like')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: '게시글 좋아요' })
-  @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
-  likePost(@Param('id', ParseIntPipe) id: number, @User('id') userId: string) {
-    return this.postService.likePost(userId, id);
+  @ApiParam({ name: 'id', type: Number })
+  togglePostLike(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
+    return this.postService.togglePostLike(userId, id);
   }
 }

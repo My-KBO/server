@@ -1,5 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { SignupDto } from './dto/signup.dto';
@@ -13,12 +14,13 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async signup(dto: SignupDto): Promise<{ id: string; email: string; nickname: string }> {
+  async signup(dto: SignupDto) {
     const hashedPassword = await this.hashPassword(dto.password);
 
-    const user = await this.prisma.user.create({
+    await this.prisma.user.create({
       data: {
         email: dto.email,
         password: hashedPassword,
@@ -28,9 +30,7 @@ export class AuthService {
     });
 
     return {
-      id: user.id,
-      email: user.email,
-      nickname: user.nickname,
+      message: '회원가입이 완료되었습니다.',
     };
   }
 
@@ -53,8 +53,12 @@ export class AuthService {
 
     const payload = { sub: user.id };
 
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.accessTokenExpiresIn'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.refreshTokenExpiresIn'),
+    });
 
     await this.saveRefreshToken(user.id, refreshToken);
 
@@ -78,19 +82,31 @@ export class AuthService {
 
     const payload = { sub: userId };
 
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.accessTokenExpiresIn'),
+    });
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('jwt.refreshTokenExpiresIn'),
+    });
 
     await this.saveRefreshToken(userId, refreshToken);
 
     return { accessToken, refreshToken };
   }
 
-  async logout(userId: string): Promise<void> {
-    await this.prisma.user.update({
-      where: { id: userId },
-      data: { refreshToken: null },
-    });
+  async logout(refreshToken: string): Promise<void> {
+    try {
+      const payload = this.jwtService.verify(refreshToken);
+      await this.prisma.user.updateMany({
+        where: {
+          id: payload.sub,
+          refreshToken: refreshToken,
+        },
+        data: { refreshToken: null },
+      });
+    } catch (e) {
+      console.error('Logout error:', e);
+    }
   }
 
   private async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {

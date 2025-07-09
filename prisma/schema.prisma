@@ -75,6 +75,8 @@ model PostLike {
 
   post         Post      @relation(fields: [postId], references: [id])
   user         User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, postId])
 }
 
 model CommentLike {
@@ -97,7 +99,6 @@ model Schedule {
   homeScore  String
   awayTeam   String
   awayScore  String
-  tv         String
   stadium    String
   note       String
 
@@ -136,4 +137,14 @@ model TeamTopPlayer {
   value  Float     
 
   @@unique([team, name, type])
+}
+
+model News {
+  id        Int      @id @default(autoincrement())
+  title     String
+  summary   String
+  date      String
+  url       String   @unique
+  thumbnail String
+  createdAt DateTime @default(now())
 }

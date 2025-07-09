@@ -6,6 +6,5 @@ export class TodayGameDto {
   awayTeam: string;
   awayScore?: string;
   stadium: string;
-  tv: string;
   note?: string;
 }
