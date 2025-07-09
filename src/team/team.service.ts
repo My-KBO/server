@@ -10,19 +10,6 @@ import { TeamHotPostDto } from './dto/team-hot-post.dto';
 export class TeamService {
   constructor(private readonly prisma: PrismaService) {}
 
-  private readonly teamCategoryMap: Record<string, PostCategory> = {
-    LG: PostCategory.LG,
-    두산: PostCategory.DOOSAN,
-    삼성: PostCategory.SAMSUNG,
-    SSG: PostCategory.SSG,
-    롯데: PostCategory.LOTTE,
-    키움: PostCategory.KIWOOM,
-    한화: PostCategory.HANHWA,
-    KIA: PostCategory.KIA,
-    NC: PostCategory.NC,
-    KT: PostCategory.KT,
-  };
-
   async getUpcomingSchedule(teamName: string) {
     const now = new Date();
     const todayFormatted = format(now, 'yyyy-MM-dd', { locale: ko });
@@ -97,7 +84,7 @@ export class TeamService {
     };
   }
   async getHotPosts(teamName: string): Promise<TeamHotPostDto[]> {
-    const category = this.teamCategoryMap[teamName];
+    const category = PostCategory[teamName];
 
     const posts = await this.prisma.post.findMany({
       where: { category },

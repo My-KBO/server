@@ -6,6 +6,8 @@ import { BusinessException } from '../common/exceptions/business.exception';
 import { ErrorCode } from '../common/constants/error/error-code';
 import { ErrorMessage } from '../common/constants/error/error-message';
 import { PostCategory } from 'src/common/constants/post-category.enum';
+import { Post } from '@prisma/client';
+import { PostDto } from './dto/post.dto';
 
 @Injectable()
 export class PostService {
@@ -166,5 +168,29 @@ export class PostService {
 
       return { liked: true };
     }
+  }
+  async getHotPosts(): Promise<PostDto[]> {
+    const posts = await this.prisma.post.findMany({
+      where: {
+        likesCount: {
+          gte: 10,
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+      take: 10,
+    });
+
+    return posts.map((post) => ({
+      id: Number(post.id),
+      title: post.title,
+      content: post.content,
+      views: Number(post.views),
+      category: post.category,
+      likes_count: Number(post.likesCount),
+      created_at: post.createdAt,
+      updated_at: post.updatedAt,
+    }));
   }
 }

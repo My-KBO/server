@@ -14,6 +14,7 @@ import { PostService } from './post.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostDto } from './dto/post.dto';
 import { User } from '../auth/decorator/user.decorator';
 import {
   ApiBearerAuth,
@@ -86,5 +87,10 @@ export class PostController {
   @ApiParam({ name: 'id', type: Number })
   togglePostLike(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
     return this.postService.togglePostLike(userId, id);
+  }
+  @Get('hotposts')
+  @ApiOperation({ summary: '추천수 10개 이상 게시글 조회' })
+  async getHotPosts(): Promise<PostDto[]> {
+    return this.postService.getHotPosts();
   }
 }
