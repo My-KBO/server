@@ -28,7 +28,7 @@ export class HighlightService {
         q: `${query} 하이라이트`,
         key: YOUTUBE_API_KEY,
         channelId: YOUTUBE_CHANNEL_ID,
-        maxResults: 50,
+        maxResults: maxResults,
         type: 'video',
         order: 'date',
       },
