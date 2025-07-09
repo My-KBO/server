@@ -39,6 +39,12 @@ export class PostController {
     return this.postService.createPost(userId, dto);
   }
 
+  @Get('hotposts')
+  @ApiOperation({ summary: '추천수 10개 이상 게시글 조회' })
+  async getHotPosts(): Promise<PostDto[]> {
+    return this.postService.getHotPosts();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: '게시글 조회 ' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
@@ -87,10 +93,5 @@ export class PostController {
   @ApiParam({ name: 'id', type: Number })
   togglePostLike(@User('id') userId: string, @Param('id', ParseIntPipe) id: number) {
     return this.postService.togglePostLike(userId, id);
-  }
-  @Get('hotposts')
-  @ApiOperation({ summary: '추천수 10개 이상 게시글 조회' })
-  async getHotPosts(): Promise<PostDto[]> {
-    return this.postService.getHotPosts();
   }
 }

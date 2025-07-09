@@ -183,12 +183,12 @@ export class PostService {
     });
 
     return posts.map((post) => ({
-      id: Number(post.id),
+      id: post.id,
       title: post.title,
       content: post.content,
-      views: Number(post.views),
+      views: post.views,
       category: post.category,
-      likes_count: Number(post.likesCount),
+      likes_count: post.likesCount,
       created_at: post.createdAt,
       updated_at: post.updatedAt,
     }));
