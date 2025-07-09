@@ -8,6 +8,8 @@ import { ErrorMessage } from '../common/constants/error/error-message';
 import { PostCategory } from 'src/common/constants/post-category.enum';
 import { Post } from '@prisma/client';
 import { PostDto } from './dto/post.dto';
+import { PostDetailDto } from './dto/post-detail.dto';
+import { PostListResponseDto } from './dto/post-list-response.dto';
 
 @Injectable()
 export class PostService {
@@ -40,7 +42,7 @@ export class PostService {
     category?: PostCategory;
     page: number;
     limit: number;
-  }) {
+  }): Promise<PostListResponseDto> {
     const where: any = {};
 
     if (category) {
@@ -54,7 +56,7 @@ export class PostService {
         take: limit,
         orderBy: { createdAt: 'desc' },
         include: {
-          user: { select: { id: true, nickname: true } },
+          user: { select: { nickname: true } },
           _count: { select: { comments: true, likes: true } },
         },
       }),
@@ -63,9 +65,18 @@ export class PostService {
 
     return {
       data: posts.map((post) => ({
-        ...post,
-        commentsCount: post._count.comments,
-        likesCount: post._count.likes,
+        id: post.id,
+        title: post.title,
+        content: post.content,
+        views: post.views,
+        category: post.category,
+        likes_count: post._count.likes,
+        comments_count: post._count.comments,
+        created_at: post.createdAt.toISOString().substring(0, 10),
+        updated_at: post.updatedAt.toISOString().substring(0, 10),
+        user: {
+          nickname: post.user.nickname,
+        },
       })),
       meta: {
         total,
@@ -75,18 +86,22 @@ export class PostService {
     };
   }
 
-  async getPostDetail(postId: number) {
+  async getPostDetail(postId: number): Promise<PostDetailDto> {
     const post = await this.prisma.post.update({
       where: { id: postId },
       data: { views: { increment: 1 } },
       include: {
-        user: { select: { id: true, nickname: true } },
+        user: {
+          select: { nickname: true },
+        },
         comments: {
           select: {
             id: true,
             content: true,
             createdAt: true,
-            user: { select: { id: true, nickname: true } },
+            user: {
+              select: { nickname: true },
+            },
           },
           orderBy: { createdAt: 'asc' },
         },
@@ -101,9 +116,29 @@ export class PostService {
     }
 
     return {
-      ...post,
-      likesCount: post._count.likes,
-      commentsCount: post._count.comments,
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      views: post.views,
+      category: post.category,
+      likes_count: post._count.likes,
+      comments_count: post._count.comments,
+
+      created_at: post.createdAt.toISOString().substring(0, 10),
+      updated_at: post.updatedAt.toISOString().substring(0, 10),
+
+      user: {
+        nickname: post.user.nickname,
+      },
+
+      comments: post.comments.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        created_at: comment.createdAt.toISOString().substring(0, 10),
+        user: {
+          nickname: comment.user.nickname,
+        },
+      })),
     };
   }
 
@@ -176,6 +211,13 @@ export class PostService {
           gte: 10,
         },
       },
+      include: {
+        user: {
+          select: {
+            nickname: true,
+          },
+        },
+      },
       orderBy: {
         createdAt: 'asc',
       },
@@ -189,8 +231,11 @@ export class PostService {
       views: post.views,
       category: post.category,
       likes_count: post.likesCount,
-      created_at: post.createdAt,
-      updated_at: post.updatedAt,
+      created_at: post.createdAt.toISOString().substring(0, 10),
+      updated_at: post.updatedAt.toISOString().substring(0, 10),
+      user: {
+        nickname: post.user.nickname,
+      },
     }));
   }
 }

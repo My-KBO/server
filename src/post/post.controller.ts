@@ -25,6 +25,8 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { PostCategory } from 'src/common/constants/post-category.enum';
+import { PostDetailDto } from './dto/post-detail.dto';
+import { PostListResponseDto } from './dto/post-list-response.dto';
 
 @ApiTags('Post')
 @ApiBearerAuth()
@@ -49,7 +51,7 @@ export class PostController {
   @ApiOperation({ summary: '게시글 조회 ' })
   @ApiParam({ name: 'id', type: Number, description: '게시글 ID' })
   @ApiOkResponse({ description: '게시글 상세 정보 반환' })
-  getPostDetail(@Param('id', ParseIntPipe) postId: number) {
+  getPostDetail(@Param('id', ParseIntPipe) postId: number): Promise<PostDetailDto> {
     return this.postService.getPostDetail(postId);
   }
 
@@ -63,7 +65,7 @@ export class PostController {
     @Query('category') category?: PostCategory,
     @Query('page', ParseIntPipe) page = 1,
     @Query('limit', ParseIntPipe) limit = 20,
-  ) {
+  ): Promise<PostListResponseDto> {
     return this.postService.getPosts({ category, page, limit });
   }
 
