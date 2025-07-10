@@ -11,6 +11,21 @@ import { PostDetailDto } from './dto/post-detail.dto';
 import { PostListResponseDto } from './dto/post-list-response.dto';
 import { formatDate } from '../common/helpers/date-format.helper';
 
+const categoryValueMap: Record<string, PostCategory> = {
+  GENERAL: PostCategory.GENERAL,
+  FREE: PostCategory.FREE,
+  LG: PostCategory.LG,
+  KIA: PostCategory.KIA,
+  SSG: PostCategory.SSG,
+  NC: PostCategory.NC,
+  두산: PostCategory.DOOSAN,
+  롯데: PostCategory.LOTTE,
+  삼성: PostCategory.SAMSUNG,
+  한화: PostCategory.HANHWA,
+  KT: PostCategory.KT,
+  키움: PostCategory.KIWOOM,
+};
+
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
@@ -45,8 +60,14 @@ export class PostService {
   }): Promise<PostListResponseDto> {
     const where: any = {};
 
+    console.log(category);
+
     if (category) {
-      where.category = category;
+      const enumValue = categoryValueMap[category.toUpperCase()];
+      if (enumValue) {
+        where.category = enumValue;
+      } else {
+      }
     }
 
     const [posts, total] = await this.prisma.$transaction([
